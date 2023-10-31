@@ -5,14 +5,17 @@ function ImageDisplay() {
   const [imageUrl, setImageUrl] = useState(null);
 
   useEffect(() => {
-    // Fetch the user's image from your server
     const fetchUserImage = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/user-image');
-        setImageUrl(URL.createObjectURL(new Blob([response.data])));
+        const response = await axios.get('http://localhost:3000/user-image', {
+      responseType: 'blob',
+    });
+    const blobUrl = URL.createObjectURL(response.data);
+
+    setImageUrl(blobUrl);
       } catch (error) {
         console.error('Error fetching user image:', error);
-        console.log('Error response:', error.response); // Log the response details
+        console.log('Error response:', error.response);
       }
     };
 
@@ -21,7 +24,7 @@ function ImageDisplay() {
 
   return (
     <div>
-      {imageUrl && <img src={imageUrl} alt="User" />}
+      {imageUrl && <img src={imageUrl} alt="User" style={{height: '30px'}} />}
     </div>
   );
 }
