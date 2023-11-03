@@ -6,7 +6,7 @@ import LoginSignup from "./components/login/LoginSignup.jsx";
 import LoginPage from "./components/login/LoginPage.jsx";
 import SignUpPage from "./components/login/SignUpPage.jsx";
 import axios from "axios";
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import { Routes, Route} from "react-router-dom";
 
 function App() {
   useEffect(()=>{

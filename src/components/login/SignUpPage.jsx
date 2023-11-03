@@ -1,36 +1,75 @@
-import React, {useState, useEffect} from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 const SignUpPage = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword]  = useState('');
-    const [userName, setUserName] = useState('');
-    const [profilePic, setProfilePic] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
 
-    const handleSavingData = async () => {
-        console.log(setEmail);
-        console.log(setPassword);
-        console.log(setUserName);
-        console.log(setProfilePic);
-        let data = {"email": setEmail, "password": setPassword, "profilePic": setProfilePic, "username": setUserName};
-        let resp = await axios.post("http://localhost:3000/api/v1/register",{data});
-        console.log(resp);
+  const handleSavingData = async () => {
+    if (!email || !password) {
+      return;
     }
-    return (
-        <>
+  
+    const data = {
+        email: email,
+        password: password,
+        username: userName,
+      };      
+    try {
+      console.log(data);
+      let resp = await axios.post(
+        "http://localhost:3000/api/v1/register",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(resp);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  return (
+    <>
+      <div>
+        <form>
+          <label htmlFor="username">
+            User Name{" "}
+            <input
+              type="text"
+              value={userName}
+              name="username"
+              onChange={(e) => setUserName(e.target.value)}
+            />
+          </label>
+          <label htmlFor="email">
+            Email{" "}
+            <input
+              type="email"
+              value={email}
+              name="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <label htmlFor="password">
+            Password{" "}
+            <input
+              type="password"
+              value={password}
+              name="password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+        </form>
         <div>
-            <form>
-                <label htmlFor="username">User Name <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} /></label>
-                <label htmlFor="email">Email <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-                <label htmlFor="password">Password <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} /></label>
-                <label htmlFor="avatar">Profile Picture <input type="file" name="" id="" value={profilePic} onChange={(e) => setProfilePic(e.target.value)} /></label>
-            </form>
-            <div>
-                <button onClick={handleSavingData()}>Sign Up</button>
-            </div>
+          <button onClick={handleSavingData}>Sign Up</button>
         </div>
-        </>
-    )
-}
+      </div>
+    </>
+  );
+};
 
 export default SignUpPage;
