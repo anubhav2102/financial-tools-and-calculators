@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 const LoginPage = () => {
@@ -29,15 +29,12 @@ const LoginPage = () => {
             console.log(resp);
             if(resp.status===200){
                 localStorage.setItem("email_id", email);
+                alert("Login Successful")
             }
           } catch (error) {
             console.error(error);
           }
     }
-    useEffect(()=>{
-        console.log(email);
-        console.log(password);
-    },[])
     return (
         <>
         <div>

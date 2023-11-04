@@ -28,6 +28,9 @@ const SignUpPage = () => {
         }
       );
       console.log(resp);
+      if(resp.status===200){
+        alert("Registration completed!")
+      }
     } catch (error) {
       console.error(error);
     }
