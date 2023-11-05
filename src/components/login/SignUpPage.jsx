@@ -8,6 +8,7 @@ const SignUpPage = () => {
 
   const handleSavingData = async () => {
     if (!email || !password) {
+        alert("Both email and password are required")
       return;
     }
   
@@ -32,7 +33,8 @@ const SignUpPage = () => {
         alert("Registration completed!")
       }
     } catch (error) {
-      console.error(error);
+      console.error(error.response.data);
+      alert(error.response.data);
     }
   };
   return (
