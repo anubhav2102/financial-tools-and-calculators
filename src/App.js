@@ -5,6 +5,7 @@ import ImageDisplay from './ImageDisplay';
 import LoginSignup from "./components/login/LoginSignup.jsx";
 import LoginPage from "./components/login/LoginPage.jsx";
 import SignUpPage from "./components/login/SignUpPage.jsx";
+import SIPCalculator from "./components/calculators/SIPCalculator.jsx";
 import axios from "axios";
 import { Routes, Route} from "react-router-dom";
 
@@ -45,12 +46,11 @@ function App() {
         <button onClick={handleLogout}>Logout</button>
       </div> : <LoginSignup/>}
       </div>
-      {/* <Router> */}
         <Routes>
           <Route exact element={<LoginPage/>} path="/login"/>
           <Route exact element={<SignUpPage/>} path="/register"/>
         </Routes>
-      {/* </Router> */}
+        <SIPCalculator/>
     </div>
   );
 }
