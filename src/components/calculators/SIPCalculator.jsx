@@ -24,7 +24,7 @@ const SIPCalculator = () => {
     }
     if(localStorage.getItem('email_id')){
       console.log(localStorage.getItem("email_id"));
-      let obj = {monthlyInvestment: monthlyInvestment, annualInterestRate: annualInterestRate, investmentDuration: investmentDuration, totalAmount: totalAmount};
+      let obj = {investment: monthlyInvestment, annualInterestRate: annualInterestRate, investmentDuration: investmentDuration, totalAmount: totalAmount, calculatorType: 'SIP Calculator'};
       console.log(obj);
       try {
         let data = {email: localStorage.getItem("email_id"), note: obj};
@@ -44,23 +44,34 @@ const SIPCalculator = () => {
   }
   return (
     <div>
+      <div style={{
+                height: '30vh',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+            }}>
       <h2>SIP Calculator</h2>
+      <div style={{display: 'flex'}}>
       <div>
-        <label>Monthly Investment (₹):</label>
-        <input type="number" value={monthlyInvestment} onChange={(e) => setMonthlyInvestment(e.target.value)}
+        <label style={{marginLeft: '10px', marginRight: '10px'}}>Monthly Investment (₹):</label>
+        <input style={{border: 'none', borderBottom: '1px solid grey'}} type="number" value={monthlyInvestment} onChange={(e) => setMonthlyInvestment(e.target.value)}
         />
       </div>
       <div>
-        <label>Expected Return Rate (%):</label>
-        <input type="number" value={annualInterestRate} onChange={(e) => setAnnualInterestRate(e.target.value)}
+        <label style={{marginLeft: '10px', marginRight: '10px'}}>Expected Return Rate (%):</label>
+        <input style={{border: 'none', borderBottom: '1px solid grey'}} type="number" value={annualInterestRate} onChange={(e) => setAnnualInterestRate(e.target.value)}
         />
       </div>
       <div>
-        <label>Investment Duration (years):</label>
-        <input type="number" value={investmentDuration} onChange={(e) => setInvestmentDuration(e.target.value)}/>
+        <label style={{marginLeft: '10px', marginRight: '10px'}}>Investment Duration (years):</label>
+        <input style={{border: 'none', borderBottom: '1px solid grey'}} type="number" value={investmentDuration} onChange={(e) => setInvestmentDuration(e.target.value)}/>
       </div>
-      <button onClick={calculateSIP}>Calculate</button>
-      <button disabled={!localStorage.getItem("email_id")} onClick={handleSaveNote}>Save to the note</button>
+      </div>
+      </div>
+      <div style={{display: 'flex', justifyContent: 'space-around', height: '5vh'}}>
+      <button style={{width: 'fit-content', height: 'fit-content', border: 'none', background: '#4e4ef0', color: 'white', borderRadius: '10px', padding: '7px 17px', fontSize: '14px', cursor: 'pointer'}} onClick={calculateSIP}>Calculate</button>
+      <button style={{width: 'fit-content', height: 'fit-content', border: 'none', background: '#4e4ef0', color: 'white', borderRadius: '10px', padding: '7px 17px', fontSize: '14px', cursor: 'pointer'}} disabled={!localStorage.getItem("email_id")} onClick={handleSaveNote}>Save to the note</button>
+      </div>
       {totalAmount > 0 && (
         <div>
           <h3>Total Amount: ₹{totalAmount}</h3>
@@ -70,7 +81,7 @@ const SIPCalculator = () => {
         {
           localStorage.getItem("email_id") && (
           <div>
-            <GetAllNotes/>
+            <GetAllNotes calculatorType={'SIP Calculator'} />
           </div>
           )
         }
