@@ -30,7 +30,7 @@ const LoginPage = () => {
             if(resp.status===200){
                 localStorage.setItem("email_id", email);
                 alert("Login Successful")
-                window.location.reload(true);
+                window.location.href = window.location.origin + "/dashboard";
             }
           } catch (error) {
             if(error.response){
