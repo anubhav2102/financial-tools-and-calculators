@@ -7,6 +7,8 @@ const LumpSumCalculator = () => {
     const [annualInterestRate, setAnnualInterestRate] = useState(0);
     const [investmentDuration, setInvestmentDuration] = useState(0);
     const [totalAmount, setTotalAmount] = useState(0);
+    const [id, setId] = useState('');
+    const [editStatus, setEditStatus] = useState(false);
 
     const calculateAmount = () => {
         if (investmentAmount <= 0 || annualInterestRate <= 0 || investmentDuration <= 0) {
@@ -29,6 +31,24 @@ const LumpSumCalculator = () => {
             totalAmount: totalAmount,
             calculatorType: "LumpSum Calculator"
           };
+          if(editStatus===true){
+            try {
+              let data = {email: localStorage.getItem("email_id"), note: obj, id: id};
+              let response = await axios.post("http://localhost:3000/api/v1/update-note", data);
+              console.log(response);
+              if(response.status===200){
+                setInvestmentAmount(0);
+                setAnnualInterestRate(0);
+                setInvestmentDuration(0);
+                setTotalAmount(0);
+                setId('');
+                setEditStatus(false);
+                return;
+            }
+            } catch (error) {
+              console.error(error);
+            }
+          }
           try {
             let data = { email: localStorage.getItem('email_id'), note: obj };
             let response = await axios.post('http://localhost:3000/api/v1/save-note', data);
@@ -44,6 +64,14 @@ const LumpSumCalculator = () => {
           }
         }
       };
+      function handleEditNote (data) {
+        console.log(data);
+        setInvestmentAmount(data.note.investment);
+        setAnnualInterestRate(data.note.annualInterestRate);
+        setInvestmentDuration(data.note.investmentDuration);
+        setId(data.note._id);
+        setEditStatus(true);
+      }
     return (
         <>
         <div>
@@ -83,7 +111,7 @@ const LumpSumCalculator = () => {
                 {
                 localStorage.getItem("email_id") && (
                 <div>
-                    <GetAllNotes calculatorType={'LumpSum Calculator'}/>
+                    <GetAllNotes editToBeData={handleEditNote} calculatorType={'LumpSum Calculator'} />
                 </div>
                 )
                 }

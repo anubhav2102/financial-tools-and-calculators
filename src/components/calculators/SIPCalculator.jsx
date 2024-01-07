@@ -6,6 +6,8 @@ const SIPCalculator = () => {
   const [monthlyInvestment, setMonthlyInvestment] = useState(0);
   const [annualInterestRate, setAnnualInterestRate] = useState(0);
   const [investmentDuration, setInvestmentDuration] = useState(0);
+  const [id, setId] = useState('');
+  const [editStatus, setEditStatus] = useState(false);
   const [totalAmount, setTotalAmount] = useState(0);
 
   const calculateSIP = () => {
@@ -26,6 +28,24 @@ const SIPCalculator = () => {
       console.log(localStorage.getItem("email_id"));
       let obj = {investment: monthlyInvestment, annualInterestRate: annualInterestRate, investmentDuration: investmentDuration, totalAmount: totalAmount, calculatorType: 'SIP Calculator'};
       console.log(obj);
+      if(editStatus===true){
+        try {
+          let data = {email: localStorage.getItem("email_id"), note: obj, id: id};
+          let response = await axios.post("http://localhost:3000/api/v1/update-note", data);
+          console.log(response);
+          if(response.status===200){
+            setMonthlyInvestment(0);
+            setAnnualInterestRate(0);
+            setInvestmentDuration(0);
+            setTotalAmount(0);
+            setId('');
+            setEditStatus(false);
+            return;
+        }
+        } catch (error) {
+          console.error(error);
+        }
+      }
       try {
         let data = {email: localStorage.getItem("email_id"), note: obj};
         let response = await axios.post("http://localhost:3000/api/v1/save-note", data);
@@ -41,6 +61,14 @@ const SIPCalculator = () => {
         console.error(error);
       }
     }
+  }
+  function handleEditNote (data) {
+    console.log(data);
+    setMonthlyInvestment(data.note.investment);
+    setAnnualInterestRate(data.note.annualInterestRate);
+    setInvestmentDuration(data.note.investmentDuration);
+    setId(data.note._id);
+    setEditStatus(true);
   }
   return (
     <div>
@@ -81,7 +109,7 @@ const SIPCalculator = () => {
         {
           localStorage.getItem("email_id") && (
           <div>
-            <GetAllNotes calculatorType={'SIP Calculator'} />
+            <GetAllNotes editToBeData={handleEditNote} calculatorType={'SIP Calculator'} />
           </div>
           )
         }

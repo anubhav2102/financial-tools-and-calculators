@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const GetAllNotes = (calculatorType) =>{
+const GetAllNotes = ({editToBeData, calculatorType}) =>{
     let [notes, setNotes] = useState([]);
     let [showNote, setShowNote] = useState(false);
     const getAllNotes = async () => {
@@ -16,12 +16,13 @@ const GetAllNotes = (calculatorType) =>{
             let tempStore = [];
             for(let i=0;i<data.length;i++){
                 if(data[i].calculatorType){
-                    if(data[i].calculatorType === calculatorType.calculatorType){
+                    if(data[i].calculatorType === calculatorType){
                         tempStore.push(data[i]);
                     }
                 }
             }
             setNotes(tempStore);
+            console.log(notes);
             setShowNote(true);
         }
     }
@@ -42,12 +43,16 @@ const GetAllNotes = (calculatorType) =>{
         console.log(formattedDate);
         return formattedDate
     }
-    const deleteNote = async (note, email) => {
+    const editNote = async (note, index) => {
+        console.log(note, index);
+        editToBeData({'note': note, 'index': index});
+    }
+    const deleteNote = async (note, index, email) => {
         let response = await axios.post("http://localhost:3000/api/v1/delete-note", {email, note});
         console.log(response);
-        if(response.status == 200){
-            alert('Note successfully removed!');
-        }
+        const updatedNotes = [...notes];
+        updatedNotes.splice(index, 1);
+        setNotes(updatedNotes);
     }
     return(
         <>
@@ -79,8 +84,8 @@ const GetAllNotes = (calculatorType) =>{
                                 <td style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>{convertToNormalDate(note.timeStamp)}</td>
                                 <td style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>
                                     <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                                    <span><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwfCYJZooXUxEEzGXtHy8WxSHw6jhvjv5o3A&usqp=CAU" style={{height: '16px', cursor: 'pointer'}} alt="Edit Icon" /></span>
-                                    <span><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZUvEMwJZK4_nLY9z93Cskb-mLJYZDGrHNpg&usqp=CAU" onClick={()=>deleteNote(note, localStorage.getItem('email_id'))} style={{height: '20px', cursor: 'pointer'}} alt="Delete Icon" /></span>
+                                    <span><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwfCYJZooXUxEEzGXtHy8WxSHw6jhvjv5o3A&usqp=CAU" onClick={()=>editNote(note, index)} style={{height: '16px', cursor: 'pointer'}} alt="Edit Icon" /></span>
+                                    <span><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZUvEMwJZK4_nLY9z93Cskb-mLJYZDGrHNpg&usqp=CAU" onClick={()=>deleteNote(note, index, localStorage.getItem('email_id'))} style={{height: '20px', cursor: 'pointer'}} alt="Delete Icon" /></span>
                                     </div>
                                 </td>
                             </tr>
@@ -90,7 +95,7 @@ const GetAllNotes = (calculatorType) =>{
             </div>
             )}
             {
-                notes.length==0 && showNote && (
+                notes.length===0 && showNote && (
                     <>
                     <div>
                         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTIoYUMn3jtIgPEKkNHU7Folx5MS3CNiZlFjw&usqp=CAU" style={{height: "200px"}} alt="" />
