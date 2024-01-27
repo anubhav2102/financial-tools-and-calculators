@@ -66,6 +66,7 @@ const GetAllNotes = ({editToBeData, calculatorType}) =>{
                 <table>
                     <thead>
                         <tr>
+                            <th style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>Investment Type</th>
                             <th style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>Monthly Investment</th>
                             <th style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>Annual Interest Rate</th>
                             <th style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>Investment Duration</th>
@@ -77,6 +78,13 @@ const GetAllNotes = ({editToBeData, calculatorType}) =>{
                     <tbody>
                         {notes.map((note, index) => (
                             <tr key={index}>
+                                {
+                                    (note.additionalData && note.additionalData.investType) ? (
+                                        <td style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>{note.additionalData.investType}</td>
+                                    ) : (
+                                        <td style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>NA</td>
+                                    )
+                                }
                                 <td style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>{note.investment}</td>
                                 <td style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>{note.annualInterestRate}</td>
                                 <td style={{padding: "10px", margin: "10px", border: "1px solid #a39e9e"}}>{note.investmentDuration}</td>
