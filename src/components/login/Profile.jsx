@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const Profile = () => {
     let [email, setEmail] = useState(localStorage.getItem('email_id'));
