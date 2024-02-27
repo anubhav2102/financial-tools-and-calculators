@@ -9,9 +9,9 @@ const HeaderPart = () => {
         <div className="header_part_bg">
             <div></div>
             <div style={{
-                display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "70vh", marginTop: "7rem"
+                display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "70vh"
             }}>
-                <h2 style={{fontSize: "35px", fontWeight: "300"}}>
+                <h2 style={{fontSize: "35px", fontWeight: "300", textAlign: "center"}}>
                     Explore finance and AI with our latest calculators. <br /> <br /> We have covered what all you need!
                 </h2>
                 <div style={{display: "flex", flexDirection: "column", height: "60vh", justifyContent: "space-evenly"}}>
@@ -41,7 +41,7 @@ const HeaderPart = () => {
                             </div>
                         </div>
                     </div>
-                    <div>
+                    <div style={{textAlign: "center"}}>
                         <button onMouseEnter={()=>setMouseOnExplore(true)} onMouseLeave={()=>setMouseOnExplore(false)} style={{background: (mouseOnExplore) ? "black" : "transparent", color: (mouseOnExplore) ? "white" : "black", border: "1px solid black", padding: "10px 22px", borderRadius: "6px", cursor: "pointer", fontSize: "15px", fontWeight: "600"}}>
                             Explore More...
                         </button>
