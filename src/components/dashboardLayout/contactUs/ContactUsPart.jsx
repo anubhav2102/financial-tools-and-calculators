@@ -49,7 +49,7 @@ const ContactUsPart = () => {
                         <span style={{margin: "20px"}}><input type="email" onChange={(e)=>setEmail(e.target.value)} className="input_field_contact" placeholder="Enter your Email" /></span>
                         <span style={{margin: "20px"}}><input type="text" onChange={(e)=>setMessage(e.target.value)} className="input_field_contact" placeholder="Enter your Message" /></span>
                     </div>
-                    <div style={{margin: "20px"}}>
+                    <div style={{margin: "20px", textAlign: "center"}}>
                         <button className="send_button_contact_us" onClick={()=>handleSendMessage()}>
                             Send Message
                         </button>
