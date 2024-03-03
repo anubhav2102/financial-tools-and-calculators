@@ -10,7 +10,7 @@ import LoginSignup from "../login/LoginSignup.jsx";
 const HomePage = () => {
     const [loginStatus, setLoginStatus] = useState(false);
     useEffect(()=>{
-        if(localStorage.getItem('__email__id')){
+        if(localStorage.getItem('email_id')){
             setLoginStatus(true);
         }
     },[loginStatus])

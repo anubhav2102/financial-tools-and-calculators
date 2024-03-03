@@ -47,7 +47,7 @@ const PersonalProfile = () => {
 
     const savePortfolio = async () => {
         try {
-            if(!localStorage.getItem('__email__id')){
+            if(!localStorage.getItem('email_id')){
                 alert('Please login to continue');
                 return;
             }
