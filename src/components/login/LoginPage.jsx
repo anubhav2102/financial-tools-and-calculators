@@ -18,7 +18,7 @@ const LoginPage = () => {
           try {
             console.log(data);
             let resp = await axios.post(
-              "http://localhost:3000/api/v1/login",
+              "http://localhost:8000/api/v1/login",
               data,
               {
                 headers: {

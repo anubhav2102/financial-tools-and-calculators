@@ -16,7 +16,7 @@ function ImageUpload() {
       console.log(formData);
 
       // Send the image to your server for uploading to Google Drive and updating MongoDB
-      await axios.post('http://localhost:3000/upload-image', formData, {
+      await axios.post('http://localhost:8000/upload-image', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

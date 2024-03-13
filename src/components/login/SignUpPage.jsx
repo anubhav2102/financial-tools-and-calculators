@@ -20,7 +20,7 @@ const SignUpPage = () => {
     try {
       console.log(data);
       let resp = await axios.post(
-        "http://localhost:3000/api/v1/register",
+        "http://localhost:8000/api/v1/register",
         data,
         {
           headers: {

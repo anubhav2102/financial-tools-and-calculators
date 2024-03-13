@@ -49,7 +49,7 @@ const PersonalProfile = () => {
                 return;
             }
     
-            const res = await axios.post("http://localhost:3000/api/v1/save-portfolio", {
+            const res = await axios.post("http://localhost:8000/api/v1/save-portfolio", {
                 email: localStorage.getItem('email_id'),
                 portfolioData:  [newStockData], // Send the updatedData array to the backend
                 
@@ -151,7 +151,7 @@ const PersonalProfile = () => {
                 alert('Please login to continue');
                 return;
             }
-            const res = await axios.post("http://localhost:3000/api/v1/save-portfolio", {
+            const res = await axios.post("http://localhost:8000/api/v1/save-portfolio", {
                 email: localStorage.getItem('email_id'),
                 portfolioData: workBookData
             })
@@ -166,7 +166,7 @@ const PersonalProfile = () => {
             if(!localStorage.getItem('email_id')){
                 return;
             }
-            let data = await axios.post(`http://localhost:3000/api/v1/get-portfolio`, {
+            let data = await axios.post(`http://localhost:8000/api/v1/get-portfolio`, {
                 email: localStorage.getItem('email_id')
             });
             console.log(data);

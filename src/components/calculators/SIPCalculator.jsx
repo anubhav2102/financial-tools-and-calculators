@@ -31,7 +31,7 @@ const SIPCalculator = () => {
       if(editStatus===true){
         try {
           let data = {email: localStorage.getItem("email_id"), note: obj, id: id};
-          let response = await axios.post("http://localhost:3000/api/v1/update-note", data);
+          let response = await axios.post("http://localhost:8000/api/v1/update-note", data);
           console.log(response);
           if(response.status===200){
             setMonthlyInvestment(0);
@@ -48,7 +48,7 @@ const SIPCalculator = () => {
       }
       try {
         let data = {email: localStorage.getItem("email_id"), note: obj};
-        let response = await axios.post("http://localhost:3000/api/v1/save-note", data);
+        let response = await axios.post("http://localhost:8000/api/v1/save-note", data);
         console.log(response);
         if(response.status===200){
           setMonthlyInvestment(0);

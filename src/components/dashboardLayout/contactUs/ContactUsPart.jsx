@@ -17,7 +17,7 @@ const ContactUsPart = () => {
                 "email": email,
                 "message": message
             };
-            let response = await axios.post("http://localhost:3000/api/v1/send-query", data);
+            let response = await axios.post("http://localhost:8000/api/v1/send-query", data);
             console.log(response);
             if(response.data && response.data.code && response.data.code===200){
                 setEmail('');

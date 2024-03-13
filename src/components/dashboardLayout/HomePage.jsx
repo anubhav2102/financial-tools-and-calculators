@@ -17,7 +17,9 @@ const HomePage = () => {
     return (
         <>
         <div>
-            <div>
+            <div style={{
+                    margin: (!loginStatus) ? "20px":"", display: (!loginStatus)?"flex":"", justifyContent:(!loginStatus)? "end":""
+            }}>
                 {
                     loginStatus ? <Profile/> : <LoginSignup/>
                 }
