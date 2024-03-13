@@ -12,7 +12,7 @@ const LoginSignup = () => {
             }
         }
         checkLogin();
-    },[email, loginStatus])
+    },[])
     return (
         <>
             <div style={{width: '160px', display: 'flex', justifyContent: 'space-around'}}>
