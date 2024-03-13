@@ -10,7 +10,7 @@ const GetAllNotes = ({editToBeData, calculatorType}) =>{
             let email = localStorage.getItem("email_id");
             console.log(email);
             let obj = {email: email};
-            let data = await axios.post("http://localhost:3000/api/v1/get-notes", obj);
+            let data = await axios.post("http://localhost:8000/api/v1/get-notes", obj);
             console.log(data);
             data = data.data;
             let tempStore = [];
@@ -48,7 +48,7 @@ const GetAllNotes = ({editToBeData, calculatorType}) =>{
         editToBeData({'note': note, 'index': index});
     }
     const deleteNote = async (note, index, email) => {
-        let response = await axios.post("http://localhost:3000/api/v1/delete-note", {email, note});
+        let response = await axios.post("http://localhost:8000/api/v1/delete-note", {email, note});
         console.log(response);
         const updatedNotes = [...notes];
         updatedNotes.splice(index, 1);

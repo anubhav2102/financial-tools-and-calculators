@@ -7,7 +7,7 @@ function ImageDisplay() {
   useEffect(() => {
     const fetchUserImage = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/user-image', {
+        const response = await axios.get('http://localhost:8000/user-image', {
       responseType: 'blob',
     });
     const blobUrl = URL.createObjectURL(response.data);

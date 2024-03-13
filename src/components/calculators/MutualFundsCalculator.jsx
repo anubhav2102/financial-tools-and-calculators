@@ -42,15 +42,15 @@ const MutualFundsCalculator = () => {
       console.log(localStorage.getItem("email_id"));
       let obj = {};
       if(investType === 'monthly'){
-        obj = {investment: monthlyInvestment, annualInterestRate: annualInterestRate, investmentDuration: investmentDuration, totalAmount: totalAmount, calculatorType: 'MutualFunds Calculator', investType: (investType=='monthly') ? "Monthly (SIP)" :"At Once (LumpSum)"};
+        obj = {investment: monthlyInvestment, annualInterestRate: annualInterestRate, investmentDuration: investmentDuration, totalAmount: totalAmount, calculatorType: 'MutualFunds Calculator', investType: (investType==='monthly') ? "Monthly (SIP)" :"At Once (LumpSum)"};
       }else{
-        obj = {investment: monthlyInvestment, annualInterestRate: annualInterestRate, investmentDuration: investmentDuration, totalAmount: totalAmount, calculatorType: 'MutualFunds Calculator', investType: (investType=='monthly') ? "Monthly (SIP)" : "At Once (LumpSum)"};
+        obj = {investment: monthlyInvestment, annualInterestRate: annualInterestRate, investmentDuration: investmentDuration, totalAmount: totalAmount, calculatorType: 'MutualFunds Calculator', investType: (investType==='monthly') ? "Monthly (SIP)" : "At Once (LumpSum)"};
       }
       console.log(obj);
       if(editStatus===true){
         try {
           let data = {email: localStorage.getItem("email_id"), note: obj, id: id};
-          let response = await axios.post("http://localhost:3000/api/v1/update-note", data);
+          let response = await axios.post("http://localhost:8000/api/v1/update-note", data);
           console.log(response);
           if(response.status===200){
             setMonthlyInvestment(0);
@@ -69,7 +69,7 @@ const MutualFundsCalculator = () => {
       }
       try {
         let data = {email: localStorage.getItem("email_id"), note: obj};
-        let response = await axios.post("http://localhost:3000/api/v1/save-note", data);
+        let response = await axios.post("http://localhost:8000/api/v1/save-note", data);
         console.log(response);
         if(response.status===200){
           setMonthlyInvestment(0);

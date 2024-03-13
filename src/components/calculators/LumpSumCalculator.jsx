@@ -34,7 +34,7 @@ const LumpSumCalculator = () => {
           if(editStatus===true){
             try {
               let data = {email: localStorage.getItem("email_id"), note: obj, id: id};
-              let response = await axios.post("http://localhost:3000/api/v1/update-note", data);
+              let response = await axios.post("http://localhost:8000/api/v1/update-note", data);
               console.log(response);
               if(response.status===200){
                 setInvestmentAmount(0);
@@ -51,7 +51,7 @@ const LumpSumCalculator = () => {
           }
           try {
             let data = { email: localStorage.getItem('email_id'), note: obj };
-            let response = await axios.post('http://localhost:3000/api/v1/save-note', data);
+            let response = await axios.post('http://localhost:8000/api/v1/save-note', data);
             if (response.status === 200) {
               setInvestmentAmount(0);
               setAnnualInterestRate(0);
