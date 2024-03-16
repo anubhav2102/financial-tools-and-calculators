@@ -5,60 +5,62 @@ const XLSX = require('xlsx');
 const PersonalProfile = () => {
     const [loginStatus, setLoginStatus] = useState(false);
     const [workBookData, setWorkBookData] = useState([]);
-    const [stockData, setStockData] = useState({
+    const [stockDataList, setStockDataList] = useState([{ // Initialize with one stock form
         stockName: "",
         purchaseDate: "",
         quantity: 0,
         pricePerStock: 0,
         tradeFees: 0,
-      });
+    }]);
 
-      const handleInputChange = (e) => {
+    const handleInputChange = (e, index) => { // Update stock data based on index
         const { name, value } = e.target;
-        setStockData((prevData) => ({
-          ...prevData,
-          [name]: value,
-        }));
-      };
+        const updatedStockDataList = [...stockDataList];
+        updatedStockDataList[index] = {
+            ...updatedStockDataList[index],
+            [name]: value
+        };
+        setStockDataList(updatedStockDataList);
+    };
+    const handleAddMoreStock = () => {
+        setStockDataList([...stockDataList, { // Add another empty stock form
+            stockName: "",
+            purchaseDate: "",
+            quantity: 0,
+            pricePerStock: 0,
+            tradeFees: 0,
+        }]);
+    };
 
-      const handleSubmit = async (e) => {
+    const handleDeleteStock = (index) => {
+        const list = [...stockDataList];
+        list.splice(index, 1);
+        setStockDataList(list);
+    };
+
+
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        
-    
-        const newStockData = {
-            stockName: stockData.stockName,
-            purchaseDate: stockData.purchaseDate,
-            quantity: stockData.quantity,
-            pricePerStock: stockData.pricePerStock,
-            tradeFees: stockData.tradeFees,
-        };
-    
         // Save to frontend storage
-        const storedData = JSON.parse(localStorage.getItem('stockData')) || [];
-        const updatedData = [...storedData, newStockData];
-    localStorage.setItem('stockData', JSON.stringify(updatedData));
-        
+        localStorage.setItem('stockDataList', JSON.stringify(stockDataList));
 
-
-    
         // Save to backend
         try {
             if (!localStorage.getItem('email_id')) {
                 alert('Please login to continue');
                 return;
             }
-    
+
             const res = await axios.post("http://localhost:8000/api/v1/save-portfolio", {
                 email: localStorage.getItem('email_id'),
-                portfolioData:  [newStockData], // Send the updatedData array to the backend
-                
+                portfolioData: stockDataList,
             });
-    
+
             if (res.status === 200) {
                 console.log("Portfolio saved successfully to the server.");
-                localStorage.removeItem('stockData');
-
+                localStorage.removeItem('stockDataList');
             } else {
                 console.error("Error saving portfolio to the server:", res.data.message);
             }
@@ -67,15 +69,14 @@ const PersonalProfile = () => {
             alert("Error saving portfolio to the server. Please try again.");
         }
 
-       
-    
-        setStockData({
+        // Reset stock data list
+        setStockDataList([{ // Reset to one stock form
             stockName: "",
             purchaseDate: "",
             quantity: 0,
             pricePerStock: 0,
             tradeFees: 0,
-        });
+        }]);
     };
     
       const exportToCSV = () => {
@@ -214,40 +215,53 @@ const PersonalProfile = () => {
                             )
                         }
                     </div>
-                    <div className="stock-values" style={{margin:'20px'}}>  
-                    <h2>Add Stock Information</h2>
-            <form onSubmit={handleSubmit} className="stock-form" style={{display:'flex',flexDirection:'column',width:'300px'}}>
-              <div className="form-group" style={{marginBottom:'15px'}}>
-                <label htmlFor="stockName" style={{fontWeight:'bold',marginBottom:'5px'}}>Stock Name:</label>
-                <input type="text" id="stockName" name="stockName" style={{padding:'8px',fontSize:'14px'}} value={stockData.stockName} onChange={handleInputChange} required />
-              </div>
+                    {stockDataList.map((stockData, index) => (
+                        <div key={index} className="stock-values" style={{ margin: '20px' }}>
+                            <h2>Add Stock Information</h2>
+                            <form onSubmit={(e) => handleSubmit(e, index)} className="stock-form" style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
+                                <div className="form-group" style={{ marginBottom: '15px' }}>
+                                    <label htmlFor="stockName" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Stock Name:</label>
+                                    <input type="text" id="stockName" name="stockName" style={{ padding: '8px', fontSize: '14px' }} value={stockData.stockName} onChange={(e) => handleInputChange(e, index)} required />
+                                </div>
+                                <div className="form-group" style={{ marginBottom: '15px' }}>
+                                    <label htmlFor="purchaseDate" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Purchase Date:</label>
+                                    <input type="date" id="purchaseDate" name="purchaseDate" style={{ padding: '8px', fontSize: '14px' }} value={stockData.purchaseDate} onChange={(e) =>handleInputChange(e, index)} required />
+                                </div>
 
-              <div className="form-group"  style={{marginBottom:'15px'}}>
-                <label htmlFor="purchaseDate"  style={{fontWeight:'bold',marginBottom:'5px'}}>Purchase Date:</label>
-                <input type="date" id="purchaseDate" name="purchaseDate" style={{padding:'8px',fontSize:'14px'}} value={stockData.purchaseDate} onChange={handleInputChange} required />
-              </div>
+                                <div className="form-group" style={{ marginBottom: '15px' }}>
+                                    <label htmlFor="quantity" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Quantity:</label>
+                                    <input type="number" id="quantity" name="quantity" style={{ padding: '8px', fontSize: '14px' }} value={stockData.quantity} onChange={(e) =>handleInputChange(e, index)} required />
+                                </div>
 
-              <div className="form-group" style={{marginBottom:'15px'}}>
-                <label htmlFor="quantity"  style={{fontWeight:'bold',marginBottom:'5px'}}>Quantity:</label>
-                <input type="number" id="quantity" name="quantity" style={{padding:'8px',fontSize:'14px'}} value={stockData.quantity} onChange={handleInputChange} required />
-              </div>
+                                <div className="form-group" style={{ marginBottom: '15px' }}>
+                                    <label htmlFor="pricePerStock" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Price Per Stock:</label>
+                                    <input type="number" id="pricePerStock" name="pricePerStock" style={{ padding: '8px', fontSize: '14px' }} value={stockData.pricePerStock} onChange={(e) =>handleInputChange(e, index)} required />
+                                </div>
 
-              <div className="form-group"  style={{marginBottom:'15px'}}>
-                <label htmlFor="pricePerStock"  style={{fontWeight:'bold',marginBottom:'5px'}} >Price Per Stock:</label>
-                <input type="number" id="pricePerStock" name="pricePerStock" style={{padding:'8px',fontSize:'14px'}} value={stockData.pricePerStock} onChange={handleInputChange} required />
-              </div>
+                                <div className="form-group" style={{ marginBottom: '15px' }}>
+                                    <label htmlFor="tradeFees" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Trade Fees:</label>
+                                    <input type="number" id="tradeFees" name="tradeFees" style={{ padding: '8px', fontSize: '14px' }} value={stockData.tradeFees} onChange={(e) =>handleInputChange(e, index)} required />
+                                </div>
 
-              <div className="form-group"  style={{marginBottom:'15px'}}>
-                <label htmlFor="tradeFees"  style={{fontWeight:'bold',marginBottom:'5px'}}>Trade Fees:</label>
-                <input type="number" id="tradeFees" name="tradeFees" style={{padding:'8px',fontSize:'14px'}} value={stockData.tradeFees} onChange={handleInputChange} required />
-              </div>
+                                {stockDataList.length > 1 && <button onClick={() => handleDeleteStock(index)}>Delete</button>}
 
-              <button type="submit" className="add-stock-btn">
-                Add Stock
-              </button>
-            </form> 
 
-                    </div>
+                               
+                            </form>
+                           
+                        </div>
+                    ))}
+
+
+           <div style={{  margin: '20px' }}>
+                <button onClick={handleAddMoreStock}>Add more stock</button>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+                <button onClick={handleSubmit}>Save these Stock</button>
+            </div>
+
+
                     <div className="export-btn">
             <button onClick={exportToCSV}>Export to CSV</button>
           </div>
