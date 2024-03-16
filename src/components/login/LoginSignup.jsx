@@ -1,18 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {Link} from "react-router-dom";
 
 const LoginSignup = () => {
-    let [email, setEmail] = useState({});
-    let [loginStatus, setLoginStatus] = useState(false);
-    useEffect(()=>{
-        const checkLogin = () => {
-            if(localStorage.getItem("email_id")){
-                setLoginStatus(true);
-                setEmail({user: localStorage.getItem("email_id")});
-            }
-        }
-        checkLogin();
-    },[])
     return (
         <>
             <div style={{width: '160px', display: 'flex', justifyContent: 'space-around'}}>
