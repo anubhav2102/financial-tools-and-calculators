@@ -1,21 +1,31 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const ChatGPTScreen = ({currentItem}) => {
     let [allChats, setAllChats] = useState([]);
     let [originalChats, setOriginalChats] = useState([]);
     const [inputValue, setInputValue] = useState('');
+    let [response, setResponse] = useState('');
 
     const handleInputChange = (event) => {
         setInputValue(event.target.value);
     };
 
-    const handleEnterPress = (event) => {
+    const handleEnterPress = async (event) => {
         if (event.key === 'Enter') {
         console.log(inputValue);
         setInputValue('');
         let newObj = {timeStamp: new Date(), response: '', prompt: inputValue};
         setAllChats([...originalChats, newObj]);
         console.log(allChats);
+        let prompt = inputValue
+        try {
+            const response = await axios.post('http://localhost:8000/api/v1/generate-response', { prompt });
+            console.log(response);
+            setResponse(response.data.response);
+          } catch (error) {
+            console.error('Error:', error);
+          }
         }
     };
     useEffect(()=>{
@@ -34,16 +44,16 @@ const ChatGPTScreen = ({currentItem}) => {
     return (
         <>
         <div>
-            <div style={{height: "50vh", overflow: "hidden scroll", background: "green"}}>
+            <div style={{height: "40vh", overflow: "hidden scroll", background: "#2fa5b1"}}>
                 {
                     allChats.map((data,idx)=>{
                         return (
                             <div key={idx}>
-                                <div style={{background: "white", padding: "15px", margin: "10px", width: "70%", textAlign: 'left', float: "right"}}>
+                                <div style={{background: "white", padding: "15px", margin: "10px", width: "70%", textAlign: 'left', float: "right", borderRadius: "15px"}}>
                                     <div style={{fontSize: "13px"}}>{data.prompt}</div>
                                     <div style={{color: "grey", fontSize: "12px"}}>{data.timeStamp.toString()}</div>
                                 </div>
-                                <div style={{background: "white", padding: "15px", margin: "10px", width: "70%", textAlign: 'left', float: "left"}}>
+                                <div style={{background: "white", padding: "15px", margin: "10px", width: "70%", textAlign: 'left', float: "left", borderRadius: "15px"}}>
                                     <div style={{fontSize: "13px"}}>{data.response}</div>
                                     <div style={{color: "grey", fontSize: "12px"}}>{data.timeStamp.toString()}</div>
                                 </div>
