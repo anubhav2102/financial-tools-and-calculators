@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import TimeSeriesGraph from "../graphs/TimeSeriesGraph.jsx";
 import ChatGPTScreen from "./ChatGPTScreen.jsx";
+import "./DetailedAIModal.css";
 
 const DetailedAIModal = ({stockData}) => {
 
@@ -24,14 +25,14 @@ const DetailedAIModal = ({stockData}) => {
 
     return (
         <>
-        <div style={{textAlign: 'center', fontSize: '25px', fontWeight: "600"}}>AI assist for {symbol}</div>
-        <div style={{display: "flex"}}>
+        <div style={{textAlign: 'center', fontSize: '25px', fontWeight: "600", marginBottom: "2rem"}}>AI assist for {symbol}</div>
+        <div style={{display: "flex", justifyContent: 'space-around'}}>
             <div>
                 <div>
                     <TimeSeriesGraph data={graphData} />
                 </div>
             </div>
-            <div>
+            <div style={{width: "40vw", marginTop: '2rem'}}>
                 <ChatGPTScreen currentItem={item} />
             </div>
         </div>
