@@ -1,0 +1,10 @@
+.buttons_personalProfile{
+    cursor: pointer;
+    padding: 7px;
+    border: none;
+    border-radius: 10px;
+    background: rgb(103, 103, 255);
+    color: white;
+    font-size: 16px;
+    margin: 10px;
+}

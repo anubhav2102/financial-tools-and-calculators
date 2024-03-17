@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import "./PersonalProfile.css";
 import axios from "axios";
 const XLSX = require('xlsx');
 
 const PersonalProfile = () => {
     const [loginStatus, setLoginStatus] = useState(false);
-    const [workBookData, setWorkBookData] = useState([]);
+    let [workBookData, setWorkBookData] = useState([]);
+    let [columns, setColumns] = useState([]);
     const [stockDataList, setStockDataList] = useState([{ // Initialize with one stock form
         stockName: "",
         purchaseDate: "",
@@ -42,9 +44,11 @@ const PersonalProfile = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Save to frontend storage
-        localStorage.setItem('stockDataList', JSON.stringify(stockDataList));
+        let tempData = [];
+        for(let i=0;i<stockDataList.length;i++){
+            let obj = {'Stock Name': stockDataList[i]['stockName'],'Trade Fees': stockDataList[i]['tradeFees'], 'Stocks Bought' : stockDataList[i]['quantity'],'Date': stockDataList[i]['purchaseDate'], 'Purchase Price': stockDataList[i]['pricePerStock']};
+            tempData.push(obj);
+        }
 
         // Save to backend
         try {
@@ -55,12 +59,12 @@ const PersonalProfile = () => {
 
             const res = await axios.post("http://localhost:8000/api/v1/save-portfolio", {
                 email: localStorage.getItem('email_id'),
-                portfolioData: stockDataList,
+                portfolioData: tempData,
+                mode: 'manual'
             });
 
             if (res.status === 200) {
                 console.log("Portfolio saved successfully to the server.");
-                localStorage.removeItem('stockDataList');
             } else {
                 console.error("Error saving portfolio to the server:", res.data.message);
             }
@@ -78,33 +82,6 @@ const PersonalProfile = () => {
             tradeFees: 0,
         }]);
     };
-    
-      const exportToCSV = () => {
-        const header = ["Stock Name", "Purchase Date", "Quantity", "Price Per Stock", "Trade Fees"];
-    const csvContent = [header.join(",")];
-
-    const stockDataFromLocalStorage = JSON.parse(localStorage.getItem('stockData')) || [];
-
-    stockDataFromLocalStorage.forEach((stock) => {
-      const row = [
-        stock.stockName,
-        stock.purchaseDate,
-        stock.quantity,
-        stock.pricePerStock,
-        stock.tradeFees
-      ];
-      csvContent.push(row.join(","));
-    });
-
-    const csvString = csvContent.join("\n");
-    const blob = new Blob([csvString], { type: "text/csv" });
-    const link = document.createElement("a");
-
-    link.href = URL.createObjectURL(blob);
-    link.download = "portfolio.csv";
-    link.click();
-      };
-
       
     const handleLogout = () => {
         console.log('workign')
@@ -122,8 +99,18 @@ const PersonalProfile = () => {
         reader.onload = (event) => {
             const data = new Uint8Array(event.target.result);
             const workbook = parseExcelData(data);
-            console.log(workbook);
-            setWorkBookData(workbook)
+            let columns = workbook[0];
+            setColumns(columns);
+            let columnData = [];
+            for(let i = 1; i < workbook.length; i++) {
+                let temp = {};
+                for(let j = 0; j < columns.length; j++) {
+                    temp[columns[j]] = workbook[i][j];
+                }
+                columnData.push(temp);
+            }
+            console.log(columnData)
+            setWorkBookData(columnData)
         };
     
         reader.onerror = (event) => {
@@ -142,8 +129,30 @@ const PersonalProfile = () => {
         return jsonData;
     };
     
-    const handleMoreCustomized = () => {
-        console.log('working')
+
+    const getPortfolio = async () => {
+        try {
+            if(!localStorage.getItem('email_id')){
+                return;
+            }
+            const data = await axios.post("http://localhost:8000/api/v1/get-portfolio",{
+                email: localStorage.getItem('email_id'),
+            });
+            console.log(data);
+            if(data.data && data.data.code===200){
+                if(data.data.data.length===0){
+                    alert('No data to show');
+                    return;
+                }else{
+                    let columns = [];
+                    columns = Object.keys(data.data.data[0]);
+                    setColumns(columns);
+                    setWorkBookData(data.data.data);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     const savePortfolio = async () => {
@@ -152,32 +161,25 @@ const PersonalProfile = () => {
                 alert('Please login to continue');
                 return;
             }
+            console.log(workBookData);
             const res = await axios.post("http://localhost:8000/api/v1/save-portfolio", {
                 email: localStorage.getItem('email_id'),
-                portfolioData: workBookData
+                portfolioData: workBookData,
+                mode: 'csv'
             })
             console.log(res);
+            if(res.data && res.data.code===200){
+                alert('Portfolio saved!');
+                setWorkBookData([]);
+            }
         } catch (error) {
             alert(error);
         }
     }
 
     useEffect(()=>{
-        const handleGetPortfolioData = async ()=>{
-            if(!localStorage.getItem('email_id')){
-                return;
-            }
-            let data = await axios.post(`http://localhost:8000/api/v1/get-portfolio`, {
-                email: localStorage.getItem('email_id')
-            });
-            console.log(data);
-            if(data.status===200){
-                console.log('code here---')
-                setWorkBookData(data.data);
-            }
-        }
-        handleGetPortfolioData();
-    },[])
+        console.log(workBookData);
+    }, [workBookData]);
     
     return (
         <div>
@@ -198,19 +200,46 @@ const PersonalProfile = () => {
                     </div>
                     <div>
                         {
-                            workBookData.length>0 && (
+                           workBookData && workBookData.length>0 ? (
                                 <div>
-                                    {workBookData.map((row, rowIndex) => (
-                                        <div key={rowIndex}>
-                                            {row.map((cell, cellIndex) => (
-                                                <span key={cellIndex}>{cell}</span>
-                                            ))}
-                                        </div>
-                                    ))}
-                                    <div>
-                                        <button onClick={savePortfolio}>Save as portfolio</button>
-                                        <button onClick={handleMoreCustomized}>Suggest me a better one</button>
+                                    <div style={{display: "flex", justifyContent: "space-between"}}>
+                                        {
+                                            columns.map((item, idx)=>{
+                                                return (
+                                                    <div style={{fontSize: "13px", width: "8%"}} key={idx}>
+                                                        {item}
+                                                    </div>
+                                                )
+                                            })
+                                        }
                                     </div>
+                                    <div style={{display: "flex", justifyContent: 'space-between'}}>
+                                    {
+                                        columns.map((item, idx)=>{
+                                            return (
+                                                <div key={idx}>
+                                                    {
+                                                        workBookData.map((val, index)=>{
+                                                            return (
+                                                                <div key={index} style={{fontSize: "13px", width: "8%", textAlign: "center"}}>
+                                                                    {val[item]}
+                                                                </div>
+                                                            )
+                                                        })
+                                                    }
+                                                </div>
+                                            )
+                                        })
+                                    }
+                                    </div>
+                                    <div>
+                                        <button className="buttons_personalProfile" onClick={()=>savePortfolio('csv')}>Save as portfolio</button>
+                                        {/* <button className="buttons_personalProfile" onClick={handleMoreCustomized}>Suggest me a better one</button> */}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    <button className="buttons_personalProfile" onClick={getPortfolio}>Get your portfolio</button>
                                 </div>
                             )
                         }
@@ -218,32 +247,32 @@ const PersonalProfile = () => {
                     {stockDataList.map((stockData, index) => (
                         <div key={index} className="stock-values" style={{ margin: '20px' }}>
                             <h2>Add Stock Information</h2>
-                            <form onSubmit={(e) => handleSubmit(e, index)} className="stock-form" style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
+                            <form onSubmit={(e) => handleSubmit(e, index)} className="stock-form" style={{ display: 'flex', flexDirection: 'column' }}>
                                 <div className="form-group" style={{ marginBottom: '15px' }}>
-                                    <label htmlFor="stockName" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Stock Name:</label>
+                                    <label htmlFor="stockName" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Stock Name:</label>
                                     <input type="text" id="stockName" name="stockName" style={{ padding: '8px', fontSize: '14px' }} value={stockData.stockName} onChange={(e) => handleInputChange(e, index)} required />
                                 </div>
                                 <div className="form-group" style={{ marginBottom: '15px' }}>
-                                    <label htmlFor="purchaseDate" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Purchase Date:</label>
+                                    <label htmlFor="purchaseDate" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Purchase Date:</label>
                                     <input type="date" id="purchaseDate" name="purchaseDate" style={{ padding: '8px', fontSize: '14px' }} value={stockData.purchaseDate} onChange={(e) =>handleInputChange(e, index)} required />
                                 </div>
 
                                 <div className="form-group" style={{ marginBottom: '15px' }}>
-                                    <label htmlFor="quantity" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Quantity:</label>
+                                    <label htmlFor="quantity" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Quantity:</label>
                                     <input type="number" id="quantity" name="quantity" style={{ padding: '8px', fontSize: '14px' }} value={stockData.quantity} onChange={(e) =>handleInputChange(e, index)} required />
                                 </div>
 
                                 <div className="form-group" style={{ marginBottom: '15px' }}>
-                                    <label htmlFor="pricePerStock" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Price Per Stock:</label>
+                                    <label htmlFor="pricePerStock" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Price Per Stock:</label>
                                     <input type="number" id="pricePerStock" name="pricePerStock" style={{ padding: '8px', fontSize: '14px' }} value={stockData.pricePerStock} onChange={(e) =>handleInputChange(e, index)} required />
                                 </div>
 
                                 <div className="form-group" style={{ marginBottom: '15px' }}>
-                                    <label htmlFor="tradeFees" style={{ fontWeight: 'bold', marginBottom: '5px' }}>Trade Fees:</label>
+                                    <label htmlFor="tradeFees" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Trade Fees:</label>
                                     <input type="number" id="tradeFees" name="tradeFees" style={{ padding: '8px', fontSize: '14px' }} value={stockData.tradeFees} onChange={(e) =>handleInputChange(e, index)} required />
                                 </div>
 
-                                {stockDataList.length > 1 && <button onClick={() => handleDeleteStock(index)}>Delete</button>}
+                                {stockDataList.length > 1 && <button className="buttons_personalProfile" style={{width: "18%"}} onClick={() => handleDeleteStock(index)}>Delete</button>}
 
 
                                
@@ -253,18 +282,15 @@ const PersonalProfile = () => {
                     ))}
 
 
-           <div style={{  margin: '20px' }}>
-                <button onClick={handleAddMoreStock}>Add more stock</button>
+           <div style={{display: 'flex', alignItems: 'center'}}>
+           <div>
+                <button className="buttons_personalProfile" onClick={handleAddMoreStock}>Add more stock</button>
             </div>
 
-            <div style={{ textAlign: 'center' }}>
-                <button onClick={handleSubmit}>Save these Stock</button>
+            <div>
+                <button className="buttons_personalProfile" onClick={handleSubmit}>Save Stock</button>
             </div>
-
-
-                    <div className="export-btn">
-            <button onClick={exportToCSV}>Export to CSV</button>
-          </div>
+           </div>
                     </>
                 )
             }
