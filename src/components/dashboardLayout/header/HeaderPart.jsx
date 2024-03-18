@@ -1,9 +1,32 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import DashboardPage from '../DashboardPage.jsx';
+
 import "./HeaderPart.css";
 
 const HeaderPart = () => {
     let [mouseOnExplore, setMouseOnExplore] = useState(false);
     let [mouseOnCards, setMouseOnCards] = useState([false, false, false]);
+
+    const navigate=useNavigate();
+
+
+
+    const handlebuttonclick=()=>{
+
+        navigate("/dashboard");
+        console.log("route is working")
+
+
+
+    }
+
+    const handlebutton2click=()=>{
+
+
+        navigate("profile");
+        console.log("profile redirection is working")
+    }
     return (
         <>
         <div className="header_part_bg">
@@ -12,32 +35,32 @@ const HeaderPart = () => {
                 display: "flex", flexDirection: "column", justifyContent: "space-evenly", height: "70vh"
             }}>
                 <h2 style={{fontSize: "35px", fontWeight: "300", textAlign: "center"}}>
-                    Explore finance and AI with our latest calculators. <br /> <br /> We have covered what all you need!
+                Discover the power of technology to transform your financial decisions. <br /> <br /> We have covered what all you need!
                 </h2>
                 <div style={{display: "flex", flexDirection: "column", height: "60vh", justifyContent: "space-evenly"}}>
                     <div style={{display: "flex", justifyContent: "space-evenly"}}>
                         <div onMouseEnter={()=>setMouseOnCards([true,false,false])} onMouseLeave={()=>setMouseOnCards([false,false,false])} 
                         style={{height: "250px", cursor: "pointer", width: "250px", background: (mouseOnCards[0]===true) ? "lightgrey" : "white", border: (mouseOnCards[0]===true) ? "none" : "1px solid grey", borderRadius: "10px", padding:"10px", margin: "10px",display: "flex", flexDirection: "column", justifyContent: "space-evenly"}}>
-                            <div style={{fontSize:"22px", fontWeight: "700"}}>SIP Calculator</div>
-                            <div>Calculate your SIP</div>
-                            <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                            <button style={{ cursor: "pointer", padding: "10px 20px", border: "none", background: "#6a6afb", color: "white", fontSize: "16px", borderRadius: "14px", width: "120px" }}>Open</button>
+                            <div style={{textAlign:"Center",fontSize:"22px", fontWeight: "700"}}>New comers</div>
+                            <div style={{textAlign:"Center"}}>Click if you dont know anything about finance</div>
+                            <div style={{display: "flex", alignItems: "centesr", justifyContent: "center"}}>
+                            <button onClick={handlebuttonclick} style={{ cursor: "pointer", padding: "10px 20px", border: "none", background: "#6a6afb", color: "white", fontSize: "16px", borderRadius: "14px", width: "120px" }}>Open</button>
                             </div>
                         </div>
                         <div onMouseEnter={()=>setMouseOnCards([false,true,false])} onMouseLeave={()=>setMouseOnCards([false,false,false])} 
                         style={{height: "250px", cursor: "pointer", width: "250px",background: (mouseOnCards[1]===true) ? "lightgrey" : "white", border: (mouseOnCards[1]===true) ? "none" : "1px solid grey", borderRadius: "10px", padding:"10px", margin: "10px",display: "flex", flexDirection: "column", justifyContent: "space-evenly"}}>
-                            <div style={{fontSize:"22px", fontWeight: "700"}}>LumpSum Calculator</div>
-                            <div>Calculate your LumpSum</div>
+                            <div style={{textAlign:"center",fontSize:"22px", fontWeight: "700"}}>Intermediate</div>
+                            <div style={{textAlign:"Center"}}>Click here if you know somewhat idea about finance</div>
                             <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                            <button style={{ cursor: "pointer", padding: "10px 20px", border: "none", background: "#6a6afb", color: "white", fontSize: "16px", borderRadius: "14px", width: "120px" }}>Open</button>
+                            <button onClick={handlebutton2click} style={{ cursor: "pointer", padding: "10px 20px", border: "none", background: "#6a6afb", color: "white", fontSize: "16px", borderRadius: "14px", width: "120px" }}>Open</button>
                             </div>                        
                         </div>
                         <div onMouseEnter={()=>setMouseOnCards([false,false,true])} onMouseLeave={()=>setMouseOnCards([false,false,false])} 
                         style={{height: "250px", cursor: "pointer", width: "250px",background: (mouseOnCards[2]===true) ? "lightgrey" : "white", border: (mouseOnCards[2]===true) ? "none" :"1px solid grey", borderRadius: "10px", padding:"10px", margin: "10px",display: "flex", flexDirection: "column", justifyContent: "space-evenly"}}>
-                            <div style={{fontSize:"22px", fontWeight: "700"}}>Mutual Funds Calculator</div>
-                            <div>Calculate your Mutual Funds</div>
+                            <div style={{textAlign:"center",fontSize:"22px", fontWeight: "700"}}>Knowledgeable</div>
+                            <div style={{textAlign:"Center"}}>Click here if you know about portfolio and know about investments planning</div>
                             <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                            <button style={{ cursor: "pointer", padding: "10px 20px", border: "none", background: "#6a6afb", color: "white", fontSize: "16px", borderRadius: "14px", width: "120px" }}>Open</button>
+                            <button onClick={handlebutton2click} style={{ cursor: "pointer", padding: "10px 20px", border: "none", background: "#6a6afb", color: "white", fontSize: "16px", borderRadius: "14px", width: "120px" }}>Open</button>
                             </div>
                         </div>
                     </div>

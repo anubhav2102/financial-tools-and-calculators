@@ -10,6 +10,10 @@ const AboutPart = () => {
     let [exampleStock1, setExampleStock1] = useState({});
     let [exampleStock2, setExampleStock2] = useState({});
     let [exampleStock3, setExampleStock3] = useState({});
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [companyData, setCompanyData] = useState([]);
+
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -50,6 +54,7 @@ const AboutPart = () => {
 
         getExampleData();
 
+
         const storedData = localStorage.getItem('allCompanyData');
         if (storedData) {
             const data = JSON.parse(storedData);
@@ -65,11 +70,31 @@ const AboutPart = () => {
         setSearchParam(inputValue);
         const filteredData = originalItems.filter(item => item && item.name && item.name.toLowerCase().includes(inputValue.toLowerCase()));
         setFilteredItems(filteredData);
-        console.log(filteredData);
+        console.log(filteredData, "THESE ARE SEARCHED OPTIONS");
     };
     
-    const handleCurrentSelectedSearchItem = (item, idx) => {
-    }
+    const handleCurrentSelectedSearchItem = async (item) => {
+        setSelectedItem(item);
+        setSearchParam('');
+
+
+        const symbol = item.symbol;
+        try {
+            const response = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&outputsize=full&apikey=Z4PD4P1WP0CIJIEQ&interval=5min`);
+            const responseData = response.data; // Extracting data from the response object
+
+            if (responseData.Information) {
+                console.log("Information message:", responseData.Information);
+            } else{
+
+           setCompanyData(responseData);
+           
+        console.log(responseData, "info of searched company data"); // Logging the data
+            }
+        } catch (error) {
+            console.error('Error fetching company data:', error);
+        }
+    };
 
     return(
         <>
@@ -83,7 +108,7 @@ const AboutPart = () => {
                         {
                             searchParam!=='' && filteredItems.map((item, idx)=>{
                                 return (
-                                <div key={idx} style={{cursor: 'pointer'}} onClick={handleCurrentSelectedSearchItem(item, idx)}>
+                                <div key={idx} style={{cursor: 'pointer'}} onClick={()=>handleCurrentSelectedSearchItem(item)}>
                                     {item.name}
                                 </div>
                                 )
@@ -93,7 +118,9 @@ const AboutPart = () => {
                 </div>
                 <div style={{display: (searchParam==='') ? 'flex':'none', justifyContent: 'space-between', alignItems: 'center', flexDirection: "column", height: '80vh'}}>
                     <div style={{display: 'flex'}}>
-                        <StockVisual item1={exampleStock1} item2={exampleStock2} item3={exampleStock3}/>
+                    {!selectedItem && <StockVisual item1={exampleStock1} item2={exampleStock2} item3={exampleStock3} />}
+                    {selectedItem && companyData && <StockVisual item1={exampleStock1} item2={exampleStock2} item3={exampleStock3} searchedCompanyData={companyData} />}
+
                     </div>
                     <div style={{background: 'white', fontSize: '16px', cursor: 'pointer', padding: '10px', margin: '10px', borderRadius: '15px'}}>
                         Show More →
