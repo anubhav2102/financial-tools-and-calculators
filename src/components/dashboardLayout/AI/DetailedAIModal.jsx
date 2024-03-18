@@ -7,7 +7,6 @@ const DetailedAIModal = ({stockData}) => {
 
     let [symbol, setSymbol] = useState('');
     let [graphData, setGraphData] = useState({});
-    let [item, setItem] = useState({});
 
     useEffect(()=>{
         console.log(stockData);
@@ -19,7 +18,6 @@ const DetailedAIModal = ({stockData}) => {
                 close: parseFloat(timeSeriesData[date]['4. close'])
             }));
             setGraphData(formattedData);
-            setItem(stockData);
         }
     }, [stockData]);
 
@@ -33,7 +31,7 @@ const DetailedAIModal = ({stockData}) => {
                 </div>
             </div>
             <div style={{width: "40vw", marginTop: '2rem'}}>
-                <ChatGPTScreen currentItem={item} />
+                <ChatGPTScreen currentItem={symbol} />
             </div>
         </div>
         </>
