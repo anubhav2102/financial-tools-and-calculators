@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import DashboardPage from '../DashboardPage.jsx';
 
 import "./HeaderPart.css";
 
@@ -22,6 +21,10 @@ const HeaderPart = () => {
     }
 
     const handlebutton2click=()=>{
+        if(!localStorage.getItem('email_id')){
+            window.location.href='http://localhost:3000/login';
+            return;
+        }
 
 
         navigate("profile");

@@ -103,7 +103,15 @@ const StockVisual = ({item1, item2, item3,searchedCompanyData}) => {
                             <img onClick={closeAIModal} src="/assets/Close.svg" style={{height: "20px", cursor: "pointer"}} alt="" />
                         </div>
                         <div>
-                            <DetailedAIModal stockData={currentStockData} />
+                            {
+                                loading ? <>
+                                <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                    <img src="/assets/loadingripple.svg" style={{height: "200px"}} alt="" />
+                                </div>
+                                </> : <>
+                                <DetailedAIModal stockData={currentStockData} />
+                                </>
+                            }
                         </div>
                     </div>
                 </div>
