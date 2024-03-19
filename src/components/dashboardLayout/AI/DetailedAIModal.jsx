@@ -7,8 +7,10 @@ const DetailedAIModal = ({stockData}) => {
 
     let [symbol, setSymbol] = useState('');
     let [graphData, setGraphData] = useState({});
+    let [loading, setLoading] = useState(false);
 
     useEffect(()=>{
+        setLoading(true);
         console.log(stockData);
         if(stockData['Meta Data'] && stockData['Meta Data']['2. Symbol'] && stockData['Time Series (Daily)']){
             setSymbol(stockData['Meta Data']['2. Symbol']);
@@ -19,11 +21,20 @@ const DetailedAIModal = ({stockData}) => {
             }));
             setGraphData(formattedData);
         }
+        setTimeout(() => {
+            setLoading(false);
+        }, 2000);
     }, [stockData]);
 
     return (
         <>
-        <div style={{textAlign: 'center', fontSize: '25px', fontWeight: "600", marginBottom: "2rem"}}>AI assist for {symbol}</div>
+        {
+            loading ? <>
+            <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                <img src="/assets/loadingripple.svg" style={{height:"200px"}} alt="" />
+            </div>
+            </> : <>
+            <div style={{textAlign: 'center', fontSize: '25px', fontWeight: "600", marginBottom: "2rem"}}>AI assist for {symbol}</div>
         <div style={{display: "flex", justifyContent: 'space-around'}}>
             <div>
                 <div>
@@ -34,6 +45,8 @@ const DetailedAIModal = ({stockData}) => {
                 <ChatGPTScreen currentItem={symbol} />
             </div>
         </div>
+        </>
+        }
         </>
     )
 }

@@ -13,8 +13,6 @@ const ChatGPTScreen = ({currentItem}) => {
         if (event.key === 'Enter') {
         console.log(inputValue);
         setInputValue('');
-        // let newObj = {timeStamp: new Date(), response: '', prompt: inputValue};
-        // setAllChats([newObj]);
         console.log(allChats);
         let prompt = inputValue
         try {
@@ -25,15 +23,28 @@ const ChatGPTScreen = ({currentItem}) => {
                 alert('Please login to continue');
                 return;
             }
-            const response = await axios.post('http://localhost:8000/api/v1/generate-response', { prompt, email });
+            const response = await axios.post('http://localhost:8000/api/v1/generate-response', { 
+                prompt: prompt, 
+                email: email, 
+                stockDetail: currentItem
+             });
             console.log(response);
             setAllChats([]);
             if(response.data.code===200){
                 let allChatsData = [];
-                for(let i=0;i<response.data.data.prompt.length;i++){
-                    allChatsData.push({prompt: response.data.data.prompt[i], response: response.data.data.response[i], timeStamp: response.data.data.timestamp[i]});
-                }
-                setAllChats(allChatsData);
+                        let idx = -1;
+                        for(let i=0;i<response.data.data.stockData.length;i++){
+                            if(response.data.data.stockData[i].stockDetail===currentItem){
+                                idx = i;
+                                break;
+                            }
+                        }
+                        if(idx!==-1){
+                            for(let i=0;i<response.data.data.stockData[idx].prompt.length;i++){
+                                allChatsData.push({prompt: response.data.data.stockData[idx].prompt[i], response: response.data.data.stockData[idx].response[i], timeStamp: response.data.data.stockData[idx].timestamp[i]});
+                            }
+                            setAllChats(allChatsData);
+                        }
             }
           } catch (error) {
             console.error('Error:', error);
@@ -42,32 +53,51 @@ const ChatGPTScreen = ({currentItem}) => {
     };
     const convertToTimeFormat = (dateString) => {
         const providedDate = new Date(dateString);
-  
-        // Get current date
         const currentDate = new Date();
-
-        // Check if the provided date is today
         if (providedDate.toDateString() === currentDate.toDateString()) {
-            // Format time as 12-hour AM/PM format
             const formattedTime = providedDate.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
             return formattedTime;
         }
-
-        // Check if the provided date is yesterday
         const yesterday = new Date();
         yesterday.setDate(currentDate.getDate() - 1);
         if (providedDate.toDateString() === yesterday.toDateString()) {
             return 'Yesterday';
         }
-
-        // Calculate the difference in days
         const timeDiff = Math.abs(currentDate.getTime() - providedDate.getTime());
         const diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
-
-        // Format the date as days ago
         return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
     }
     useEffect(()=>{
+        const getAutoPrompt = async () => {
+            if(localStorage.getItem('email_id') && currentItem){
+                let email = localStorage.getItem('email_id');
+                        let prompt = `Generate insights about ${currentItem} stock performance and outlook based on recent data.`;
+                        console.log(prompt)
+                        const response = await axios.post('http://localhost:8000/api/v1/generate-response', { 
+                            prompt: prompt, 
+                            email: email, 
+                            stockDetail: currentItem 
+                        });
+                        console.log(response);
+                        setAllChats([]);
+            if(response.data.code===200){
+                let allChatsData = [];
+                let idx = -1;
+                    for(let i=0;i<response.data.data.stockData.length;i++){
+                        if(response.data.data.stockData[i].stockDetail===currentItem){
+                            idx = i;
+                            break;
+                        }
+                    }
+                    if(idx!==-1){
+                        for(let i=0;i<response.data.data.stockData[idx].prompt.length;i++){
+                            allChatsData.push({prompt: response.data.data.stockData[idx].prompt[i], response: response.data.data.stockData[idx].response[i], timeStamp: response.data.data.stockData[idx].timestamp[i]});
+                        }
+                    }
+                setAllChats(allChatsData);
+            }
+            }
+        }
         const getChatsData = async () => {
             try {
                 let email = localStorage.getItem('email_id');
@@ -78,33 +108,30 @@ const ChatGPTScreen = ({currentItem}) => {
                     console.log(data);
                     if(data.data.code===200){
                         let allChatsData = [];
-                        for(let i=0;i<data.data.data.prompt.length;i++){
-                            allChatsData.push({prompt: data.data.data.prompt[i], response: data.data.data.response[i], timeStamp: data.data.data.timestamp[i]});
+                        let idx = -1;
+                        for(let i=0;i<data.data.data.stockData.length;i++){
+                            if(data.data.data.stockData[i].stockDetail===currentItem){
+                                idx = i;
+                                break;
+                            }
                         }
-                        setAllChats(allChatsData);
+                        if(idx!==-1){
+                            for(let i=0;i<data.data.data.stockData[idx].prompt.length;i++){
+                                allChatsData.push({prompt: data.data.data.stockData[idx].prompt[i], response: data.data.data.stockData[idx].response[i], timeStamp: data.data.data.stockData[idx].timestamp[i]});
+                            }
+                            setAllChats(allChatsData);
+                        }else{
+                            getAutoPrompt();
+                        }
                     }
                 }
             } catch (error) {
                 console.error(error);
-                if(localStorage.getItem('email_id')){
-                    let email = localStorage.getItem('email_id');
-                            let prompt = `Generate insights about ${currentItem} stock performance and outlook based on recent data.`;
-                            console.log(prompt)
-                            const response = await axios.post('http://localhost:8000/api/v1/generate-response', { prompt, email });
-                            console.log(response);
-                            setAllChats([]);
-                if(response.data.code===200){
-                    let allChatsData = [];
-                    for(let i=0;i<response.data.data.prompt.length;i++){
-                        allChatsData.push({prompt: response.data.data.prompt[i], response: response.data.data.response[i], timeStamp: response.data.data.timestamp[i]});
-                    }
-                    setAllChats(allChatsData);
-                }
-                }
+                getAutoPrompt();
             }
         }
         getChatsData();
-    })
+    }, [currentItem]);
 
     return (
         <>

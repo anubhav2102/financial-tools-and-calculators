@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import SIPCalculator from '../calculators/SIPCalculator';
 import LumpSumCalculator from '../calculators/LumpSumCalculator';
 import MutualFundsCalculator from '../calculators/MutualFundsCalculator';
-import { Routes, Route} from "react-router-dom";
 
 
 
