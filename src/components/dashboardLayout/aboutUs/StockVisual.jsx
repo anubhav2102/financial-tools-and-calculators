@@ -70,8 +70,8 @@ const StockVisual = ({item1, item2, item3,searchedCompanyData}) => {
             {
                 (itemName==='' || loading) ? (
                     <>
-                    <div style={{display: 'flex', alignItems: "center", justifyContent: 'center'}}>
-                    <img src="/assets/loadingripple.svg" style={{height:"100px"}} alt="" />
+                    <div style={{display: 'flex', alignItems: "center", justifyContent: 'center',height:"450px",width:"600px"}}>
+                    <img src="/assets/loadingripple.svg" style={{height:"300px"}} alt="" />
                     </div>
                     </>
                 ) : (
