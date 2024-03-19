@@ -66,9 +66,9 @@ const AboutPart = () => {
     }, []);
 
     const handleSearch = (e) => {
-        const inputValue = e.target.value;
+        const inputValue = e.target.value.toLowerCase();
         setSearchParam(inputValue);
-        const filteredData = originalItems.filter(item => item && item.name && item.name.toLowerCase().includes(inputValue.toLowerCase()));
+        const filteredData = originalItems.filter(item => item && item.name && item.name.toLowerCase().startsWith(inputValue));
         setFilteredItems(filteredData);
         console.log(filteredData, "THESE ARE SEARCHED OPTIONS");
     };

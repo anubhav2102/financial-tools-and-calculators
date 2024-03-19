@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import GetAllNotes from './GetAllNotes';
 
+
 const SIPCalculator = () => {
   const [monthlyInvestment, setMonthlyInvestment] = useState(0);
   const [annualInterestRate, setAnnualInterestRate] = useState(0);

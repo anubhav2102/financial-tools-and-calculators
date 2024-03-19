@@ -1,0 +1,1 @@
+            const response = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&outputsize=full&apikey=Z4PD4P1WP0CIJIEQ&interval=5min`);

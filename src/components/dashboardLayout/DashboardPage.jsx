@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import SIPCalculator from '../calculators/SIPCalculator';
 import LumpSumCalculator from '../calculators/LumpSumCalculator';
 import MutualFundsCalculator from '../calculators/MutualFundsCalculator';
+import { Routes, Route} from "react-router-dom";
+
 
 
 const DashboardPage = () => {
@@ -24,6 +26,8 @@ const DashboardPage = () => {
                 </div>
             </div>
             <div style={{width: '70%'}}>
+
+                
                 <div style={{display: (selectedCalculator === 'SIP Calculator') ? '' : 'none'}}><SIPCalculator /></div>
                 <div style={{display: (selectedCalculator === 'LumpSum Calculator') ? '' : 'none'}}><LumpSumCalculator /></div>
                 <div style={{display: (selectedCalculator === 'MutualFunds Calculator') ? '' : 'none'}}><MutualFundsCalculator/></div>
