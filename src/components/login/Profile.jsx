@@ -5,7 +5,7 @@ import LoginSignup from "./LoginSignup.jsx";
 import axios from "axios";
 const XLSX = require('xlsx');
 
-const Profile = () => {
+const Profile = ({opening}) => {
     let [email, setEmail] = useState(localStorage.getItem('email_id'));
     const [checkURL, setCheckURL] = useState(true);
     const Navigate = useNavigate();
@@ -32,15 +32,25 @@ const Profile = () => {
         const dataURL = `data:text/csv;charset=utf-8,${encodeURIComponent(csvData)}`;
         window.open(dataURL, '_blank');
     }
+    const openDashboard = ()=>{
+        Navigate("/dashboard");
+    }
     return (
         <>
             {
                 !checkURL ? (
-                    <div style={{display: 'flex', justifyContent: 'end', height: '90px'}}>
+                    <div style={{display: 'flex', justifyContent: 'end', height: '90px', margin: "10px"}}>
                 <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 {
                     email ? (
                         <>
+                        {
+                            opening!=='dashboard' && (
+                                <span style={{marginRight: "1rem"}}>
+                                    <div style={{cursor: "pointer", color: "blue"}} onClick={openDashboard}>Dashboard</div>
+                                </span>
+                            )
+                        }
                         <span style={{marginRight: "1rem"}}>
                             <button onClick={openPortfolio} style={{width: "110px", padding: "8px", border: "none", borderRadius: "10px", fontSize: "16px", cursor: "pointer", background: "#5f5fff", color: "white"}}>Portfolio ↓</button>
                         </span>
