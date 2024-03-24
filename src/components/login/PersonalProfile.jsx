@@ -15,13 +15,49 @@ const PersonalProfile = () => {
         tradeFees: 0,
     }]);
 
+
     const handleInputChange = (e, index) => { // Update stock data based on index
+       
         const { name, value } = e.target;
         const updatedStockDataList = [...stockDataList];
-        updatedStockDataList[index] = {
-            ...updatedStockDataList[index],
-            [name]: value
-        };
+        if(name==="stockName")
+        {
+            
+
+            
+
+            const selectedStock =JSON.parse(localStorage.getItem('allCompanyData')).find(company=>company.name===value);
+            const symbol = selectedStock ? selectedStock.symbol : '';
+            updatedStockDataList[index] = {
+                ...updatedStockDataList[index],
+                [name]: symbol,
+            };
+
+
+        }else if (name === "purchaseDate") {
+            const [year, month, day] = value.split('-');
+            const formattedDate = `${day}/${month}/${year.substring(2)}`;
+            updatedStockDataList[index] = {
+                ...updatedStockDataList[index],
+                [name]: formattedDate
+            };
+        }else if (name === "purchaseDate") {
+            
+            const [day, month, year] = value.split('/');
+            const formattedDate = `${year.padStart(2, '20')}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            updatedStockDataList[index] = {
+                ...updatedStockDataList[index],
+                [name]: formattedDate
+            };
+        }else{
+            updatedStockDataList[index] = {
+                ...updatedStockDataList[index],
+                [name]: value
+            };
+
+        }
+        
+       console.log("this is input changes",updatedStockDataList);
         setStockDataList(updatedStockDataList);
     };
     const handleAddMoreStock = () => {
@@ -109,7 +145,7 @@ const PersonalProfile = () => {
                 }
                 columnData.push(temp);
             }
-            console.log(columnData)
+            console.log(columnData,"column data is this present");
             setWorkBookData(columnData)
         };
     
@@ -118,6 +154,9 @@ const PersonalProfile = () => {
         };
     
         reader.readAsArrayBuffer(file);
+
+        // here this is redering localstorage
+
     };
     
     
@@ -125,10 +164,26 @@ const PersonalProfile = () => {
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const sheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false });
+    
+        const dateColumnIndex = jsonData[0].indexOf('Date');
+        if (dateColumnIndex !== -1) { // If "Date" column is found
+            for (let i = 1; i < jsonData.length; i++) {
+                const dateValue = jsonData[i][dateColumnIndex];
+                if (typeof dateValue === 'string') { 
+                    const [day, month, year] = dateValue.split('-').map(Number); 
+                    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) { 
+                        jsonData[i][dateColumnIndex] = `${day}-${month}-${year}`; 
+                    }
+                }
+            }
+        }
+    
         return jsonData;
     };
     
+
+       
 
     const getPortfolio = async () => {
         try {
@@ -153,6 +208,7 @@ const PersonalProfile = () => {
         } catch (error) {
             console.error(error);
         }
+
     }
 
     const savePortfolio = async () => {
@@ -180,6 +236,17 @@ const PersonalProfile = () => {
     useEffect(()=>{
         console.log(workBookData);
     }, [workBookData]);
+
+
+    stockDataList.forEach((stockData,index)=>{
+        console.log(stockData.purchaseDate);
+
+
+    });
+
+
+    
+
     
     return (
         <div>
@@ -199,59 +266,63 @@ const PersonalProfile = () => {
                         </div>
                     </div>
                     <div>
-                        {
-                           workBookData && workBookData.length>0 ? (
-                                <div>
-                                    <div style={{display: "flex", justifyContent: "space-between"}}>
-                                        {
-                                            columns.map((item, idx)=>{
-                                                return (
-                                                    <div style={{fontSize: "13px", width: "8%"}} key={idx}>
-                                                        {item}
-                                                    </div>
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                    <div style={{display: "flex", justifyContent: 'space-between'}}>
-                                    {
-                                        columns.map((item, idx)=>{
-                                            return (
-                                                <div key={idx}>
-                                                    {
-                                                        workBookData.map((val, index)=>{
-                                                            return (
-                                                                <div key={index} style={{fontSize: "13px", width: "8%", textAlign: "center"}}>
-                                                                    {val[item]}
-                                                                </div>
-                                                            )
-                                                        })
-                                                    }
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                    </div>
-                                    <div>
-                                        <button className="buttons_personalProfile" onClick={()=>savePortfolio('csv')}>Save as portfolio</button>
-                                        {/* <button className="buttons_personalProfile" onClick={handleMoreCustomized}>Suggest me a better one</button> */}
-                                    </div>
+                                            {workBookData && workBookData.length > 0 ? (
+                            <div>
+                                <div className="table-container" style={{display:"flex",justifyContent:"center"}}>
+                                    <table className="table_personalProfile">
+                                        <thead>
+                                            <tr>
+                                                {columns.map((item, idx) => (
+                                                    <th key={idx}>{item}</th>
+                                                ))}
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {workBookData.map((rowData, rowIndex) => (
+                                                <tr key={rowIndex}>
+                                                    {columns.map((column, colIndex) => (
+                                                        <td key={colIndex}>{rowData[column]}</td>
+                                                    ))}
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
-                            ) : (
                                 <div>
-                                    <button className="buttons_personalProfile" onClick={getPortfolio}>Get your portfolio</button>
+                                    <button className="buttons_personalProfile" onClick={() => savePortfolio('csv')}>Save as portfolio</button>
                                 </div>
-                            )
-                        }
+                            </div>
+                        ) : (
+                            <div>
+                                <button className="buttons_personalProfile" onClick={getPortfolio}>Get your portfolio</button>
+                            </div>
+                        )}
+
+                        
                     </div>
                     {stockDataList.map((stockData, index) => (
                         <div key={index} className="stock-values" style={{ margin: '20px' }}>
                             <h2>Add Stock Information</h2>
                             <form onSubmit={(e) => handleSubmit(e, index)} className="stock-form" style={{ display: 'flex', flexDirection: 'column' }}>
-                                <div className="form-group" style={{ marginBottom: '15px' }}>
-                                    <label htmlFor="stockName" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Stock Name:</label>
-                                    <input type="text" id="stockName" name="stockName" style={{ padding: '8px', fontSize: '14px' }} value={stockData.stockName} onChange={(e) => handleInputChange(e, index)} required />
-                                </div>
+                            <div className="form-group" style={{ marginBottom: '15px' }}>
+                                <label htmlFor="stockName" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Stock Name:</label>
+                                <input 
+                                    type="text" 
+                                    id="stockName" 
+                                    name="stockName" 
+                                    style={{ padding: '8px', fontSize: '14px' }} 
+                                    value={stockData.name} 
+                                    onChange={(e) => handleInputChange(e, index)} 
+                                    required 
+                                    list="stockNameOptions" 
+                                />
+                                <datalist id="stockNameOptions">
+                                    {localStorage.getItem("allCompanyData") && JSON.parse(localStorage.getItem("allCompanyData")).map((company, idx) => (
+                                        <option key={idx} value={company.name} />
+                                    ))}
+                                </datalist>
+                            </div>
+
                                 <div className="form-group" style={{ marginBottom: '15px' }}>
                                     <label htmlFor="purchaseDate" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Purchase Date:</label>
                                     <input type="date" id="purchaseDate" name="purchaseDate" style={{ padding: '8px', fontSize: '14px' }} value={stockData.purchaseDate} onChange={(e) =>handleInputChange(e, index)} required />
