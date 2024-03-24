@@ -25,28 +25,57 @@ const UserPortfolio = () => {
     const handleReportCreate = () => {
         console.log('')
     }
+    const getCurrentPrice = async (stockName) => {
+        try {
+            console.log(stockName);
+        let resp = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stockName}&apikey=570NU1DEURD6CSLZ
 
+
+
+
+
+        `);
+        console.log(resp);
+        let req = resp.data['Time Series (Daily)'];
+        let allKeys = Object.keys(req);
+        console.log(allKeys);
+        console.log(req[allKeys[0]]);
+        return req[allKeys[0]]['4. close'];
+        } catch (error) {
+            return 0;
+        }
+    }
+    
     useEffect(()=>{
         const getPortfolioData = async () => {
             try {
                 let data = await axios.post('http://localhost:8000/api/v1/get-portfolio',{
-                email: localStorage.getItem('email_id')
-            });
-            console.log(data);
-            if(data.data.code===200){
-                console.log(data.data.data);
-                setTableData(data.data.data);
-                let allKeys = Object.keys(data.data.data[0]);
-                console.log(allKeys);
-                allKeys.push('Actions');
-                setColumns(allKeys);
-            }
+                    email: localStorage.getItem('email_id')
+                });
+                console.log(data);
+                if(data.data.code===200){
+                    console.log(data.data.data);
+                    let tempData = [];
+                    for(let i=0;i<data.data.data.length;i++){
+                        let obj = data.data.data[i];
+                        let currentPrice = await getCurrentPrice(data.data.data[i]['Stock Name']);
+                        obj['Current Price'] = '$'+currentPrice.toString();
+                        obj['Current Value'] = '$'+currentPrice * data.data.data[i]['Stocks Bought'];
+                        tempData.push(obj);
+                    }
+                    setTableData(tempData);
+                    let allKeys = Object.keys(tempData[0]);
+                    console.log(allKeys);
+                    allKeys.push('Ask AI?');
+                    setColumns(allKeys);
+                }
             } catch (error) {
                 console.error(error);
             }
         }
         getPortfolioData();
     }, []);
+    
     return (
         <>
         <div className="table-container" style={{display:"flex",justifyContent:"center"}}>
@@ -65,7 +94,7 @@ const UserPortfolio = () => {
                                 <td key={colIndex}>
                                     <div>
                                         {
-                                            column==='Actions' ? (
+                                            column==='Ask AI?' ? (
                                                 <div style={{textAlign: "center"}}>
                                                 <img src="/assets/eqai.svg" onClick={()=>openAI(rowData)} style={{height: "25px", cursor: "pointer"}} alt="" />
                                                 </div>
