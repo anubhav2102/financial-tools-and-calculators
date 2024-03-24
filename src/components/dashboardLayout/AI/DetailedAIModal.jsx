@@ -3,7 +3,7 @@ import TimeSeriesGraph from "../graphs/TimeSeriesGraph.jsx";
 import ChatGPTScreen from "./ChatGPTScreen.jsx";
 import "./DetailedAIModal.css";
 
-const DetailedAIModal = ({stockData}) => {
+const DetailedAIModal = ({stockData, duration}) => {
 
     let [symbol, setSymbol] = useState('');
     let [graphData, setGraphData] = useState({});
@@ -20,11 +20,19 @@ const DetailedAIModal = ({stockData}) => {
                 close: parseFloat(timeSeriesData[date]['4. close'])
             }));
             setGraphData(formattedData);
+        }else if(stockData['Meta Data'] && stockData['Meta Data']['2. Symbol'] && duration && duration==='5 min' && stockData['Time Series (5min)']){
+            setSymbol(stockData['Meta Data']['2. Symbol']);
+            const timeSeriesData = stockData['Time Series (5min)'];
+            const formattedData = Object.keys(timeSeriesData).map(date => ({
+                date,
+                close: parseFloat(timeSeriesData[date]['4. close'])
+            }));
+            setGraphData(formattedData);
         }
         setTimeout(() => {
             setLoading(false);
         }, 2000);
-    }, [stockData]);
+    }, [stockData, duration]);
 
     return (
         <>

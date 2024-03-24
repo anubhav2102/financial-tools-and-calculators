@@ -13,7 +13,7 @@ const HeaderPart = () => {
 
     const handlebuttonclick=()=>{
 
-        navigate("/dashboard");
+        navigate("/calculators");
         console.log("route is working")
 
 
@@ -45,7 +45,7 @@ const HeaderPart = () => {
                         <div onMouseEnter={()=>setMouseOnCards([true,false,false])} onMouseLeave={()=>setMouseOnCards([false,false,false])} 
                         style={{height: "250px", cursor: "pointer", width: "250px", background: (mouseOnCards[0]===true) ? "lightgrey" : "white", border: (mouseOnCards[0]===true) ? "none" : "1px solid grey", borderRadius: "10px", padding:"10px", margin: "10px",display: "flex", flexDirection: "column", justifyContent: "space-evenly"}}>
                             <div style={{textAlign:"Center",fontSize:"22px", fontWeight: "700"}}>New comers</div>
-                            <div style={{textAlign:"Center"}}>Click if you dont know anything about finance</div>
+                            <div style={{textAlign:"Center"}}>Click if you don't know anything about finance</div>
                             <div style={{display: "flex", alignItems: "centesr", justifyContent: "center"}}>
                             <button onClick={handlebuttonclick} style={{ cursor: "pointer", padding: "10px 20px", border: "none", background: "#6a6afb", color: "white", fontSize: "16px", borderRadius: "14px", width: "120px" }}>Open</button>
                             </div>
@@ -53,7 +53,7 @@ const HeaderPart = () => {
                         <div onMouseEnter={()=>setMouseOnCards([false,true,false])} onMouseLeave={()=>setMouseOnCards([false,false,false])} 
                         style={{height: "250px", cursor: "pointer", width: "250px",background: (mouseOnCards[1]===true) ? "lightgrey" : "white", border: (mouseOnCards[1]===true) ? "none" : "1px solid grey", borderRadius: "10px", padding:"10px", margin: "10px",display: "flex", flexDirection: "column", justifyContent: "space-evenly"}}>
                             <div style={{textAlign:"center",fontSize:"22px", fontWeight: "700"}}>Intermediate</div>
-                            <div style={{textAlign:"Center"}}>Click here if you know somewhat idea about finance</div>
+                            <div style={{textAlign:"Center"}}>Click here if you have idea about finance</div>
                             <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
                             <button onClick={handlebutton2click} style={{ cursor: "pointer", padding: "10px 20px", border: "none", background: "#6a6afb", color: "white", fontSize: "16px", borderRadius: "14px", width: "120px" }}>Open</button>
                             </div>                        
