@@ -8,6 +8,7 @@ const UserPortfolio = () => {
     const [tableData, setTableData] = useState([]);
     const [showOpenAI, setShowOpenAI] = useState(false);
     let [aiData, setAiData] = useState({});
+    let [loading, setLoading] = useState(false);
 
     const openAI = async (data) => {
         setShowOpenAI(true);
@@ -25,32 +26,60 @@ const UserPortfolio = () => {
     const handleReportCreate = () => {
         console.log('')
     }
-
+    const getCurrentPrice = async (stockName) => {
+        try {
+            console.log(stockName);
+        let resp = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stockName}&apikey=4OHOI8JFUFS52NXB`);
+        console.log(resp);
+        let req = resp.data['Time Series (Daily)'];
+        let allKeys = Object.keys(req);
+        console.log(allKeys);
+        console.log(req[allKeys[0]]);
+        return req[allKeys[0]]['4. close'];
+        } catch (error) {
+            return 0;
+        }
+    }
+    
     useEffect(()=>{
         const getPortfolioData = async () => {
+            setLoading(true);
             try {
                 let data = await axios.post('http://localhost:8000/api/v1/get-portfolio',{
-                email: localStorage.getItem('email_id')
-            });
-            console.log(data);
-            if(data.data.code===200){
-                console.log(data.data.data);
-                setTableData(data.data.data);
-                let allKeys = Object.keys(data.data.data[0]);
-                console.log(allKeys);
-                allKeys.push('Actions');
-                setColumns(allKeys);
-            }
+                    email: localStorage.getItem('email_id')
+                });
+                console.log(data);
+                if(data.data.code===200){
+                    console.log(data.data.data);
+                    let tempData = [];
+                    for(let i=0;i<data.data.data.length;i++){
+                        let obj = data.data.data[i];
+                        let currentPrice = await getCurrentPrice(data.data.data[i]['Stock Name']);
+                        obj['Current Price'] = '$'+currentPrice.toString();
+                        obj['Current Value'] = '$'+currentPrice * data.data.data[i]['Stocks Bought'];
+                        tempData.push(obj);
+                    }
+                    setTableData(tempData);
+                    let allKeys = Object.keys(tempData[0]);
+                    console.log(allKeys);
+                    allKeys.push('Ask AI?');
+                    setColumns(allKeys);
+                    setLoading(false);
+                }
             } catch (error) {
                 console.error(error);
+                setLoading(false);
             }
         }
         getPortfolioData();
     }, []);
+    
     return (
         <>
-        <div className="table-container" style={{display:"flex",justifyContent:"center"}}>
-            <table className="table_personalProfile">
+        <div className="table-container" style={{display:"flex",justifyContent:"center", height: "71vh"}}>
+            {
+                !loading ? (
+                    <table className="table_personalProfile">
                 <thead>
                     <tr>
                         {columns.map((item, idx) => (
@@ -65,7 +94,7 @@ const UserPortfolio = () => {
                                 <td key={colIndex}>
                                     <div>
                                         {
-                                            column==='Actions' ? (
+                                            column==='Ask AI?' ? (
                                                 <div style={{textAlign: "center"}}>
                                                 <img src="/assets/eqai.svg" onClick={()=>openAI(rowData)} style={{height: "25px", cursor: "pointer"}} alt="" />
                                                 </div>
@@ -82,6 +111,13 @@ const UserPortfolio = () => {
                     ))}
                 </tbody>
             </table>
+                ) : (
+                    <div style={{display: "flex", justifyContent: "center", alignItems: "center", flexDirection: "column"}}>
+                        <img src="/assets/loadingripple.svg" style={{height: "150px"}} alt="" />
+                        <span style={{textAlign: 'center', fontWeight: "600"}}>Dashboard loading...</span>
+                    </div>
+                )
+            }
         </div>
         <div style={{display: "flex", justifyContent: "center", margin: "20px"}}>
             <button onClick={handleReportCreate()} style={{cursor: "pointer", fontSize: "16px", padding: "13px", border: "none", borderRadius: "7px", background: "#7272ff", color: "white"}}>Generate AI based portfolio strategy report to invest better!</button>
