@@ -1,10 +1,25 @@
-.buttons_personalProfile{
+.buttons_personalProfile {
     cursor: pointer;
-    padding: 7px;
+    padding: 10px 20px; 
     border: none;
     border-radius: 10px;
     background: rgb(103, 103, 255);
     color: white;
     font-size: 16px;
     margin: 10px;
+}
+
+.table_personalProfile  {
+    border-collapse: collapse;  
+    margin-top: 20px;
+}
+
+.table_personalProfile th, .table_personalProfile td {
+    padding: 15px;
+    text-align: left;
+    border: 1px solid #ddd; 
+}
+
+.table_personalProfile th {
+    background-color: #f2f2f2; 
 }
