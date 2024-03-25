@@ -25,9 +25,7 @@ const StocksPieChart = () => {
             let obj = {};
             obj['name'] = data.data.data[i]['Stock Name'];
             if(val === 'Stocks Bought'){
-              obj[val] = data.data.data[i][val];
-            }else if(val === 'Purchase Date'){
-              obj[val] = data.data.data[i]['Date'];
+              obj[val] = Number(data.data.data[i][val]);
             }else{
               obj[val] = parseFloat(data.data.data[i][val].replace('$', '').replace(',', ''));
             }
@@ -65,12 +63,11 @@ const StocksPieChart = () => {
     },[])
   return (
     <div style={{margin: "4rem"}}>
-        <div style={{textAlign: "center", fontWeight: "500", fontSize: "20px"}}>Stock analysis with {
+        <div style={{textAlign: "center", fontWeight: "500", fontSize: "20px", display: "flex", justifyContent: "center", alignItems: "center"}}><span>Stock analysis with &nbsp;</span> {
           editClicked ? (<span style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", width: "20%", borderRadius: "10px"}} onClick={()=>setEditParam('Purchase Date')}> Purchase Date</span>
-            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", width: "20%", borderRadius: "10px"}} onClick={()=>setEditParam('Stocks Bought')}> Stocks Bought </span>
-            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", width: "20%", borderRadius: "10px"}} onClick={()=>setEditParam('Total Purchase Price')}> Total Purchase Price </span>
-            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", width: "20%", borderRadius: "10px"}} onClick={()=>setEditParam('Purchase Price')}> Purchase Price </span>
+            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", borderRadius: "10px"}} onClick={()=>setEditParam('Stocks Bought')}> Stocks Bought </span>
+            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", borderRadius: "10px"}} onClick={()=>setEditParam('Total Purchase Price')}> Total Purchase Price </span>
+            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", borderRadius: "10px"}} onClick={()=>setEditParam('Purchase Price')}> Purchase Price </span>
           </span>) : (<span>
             {currParam} <img onClick={openEdit} src="/assets/editPencil.png" style={{height: "15px", cursor: "pointer"}} alt="" />
           </span>)
