@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [userName, setUserName] = useState("");
+
+  const navigate = useNavigate();
 
   const handleSavingData = async () => {
     if (!email || !password) {
@@ -31,6 +34,7 @@ const SignUpPage = () => {
       console.log(resp);
       if(resp.status===200){
         alert("Registration completed!")
+        navigate("/login")
       }
     } catch (error) {
       console.error(error.response.data);
@@ -39,29 +43,30 @@ const SignUpPage = () => {
   };
   return (
     <>
-      <div>
-        <form>
-          <label htmlFor="username">
-            User Name{" "}
-            <input
+      <div style={{height: "90vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+        <div style={{background: "aliceblue", padding: "40px 30px 20px", borderRadius: "15px"}}>
+        <form style={{display: "flex", flexDirection: "column"}}>
+          <label htmlFor="username" style={{width: "24vw", display: "flex", alignItems: "center", margin: "10px"}}>
+            <span style={{flex: "0.5"}}>User Name</span>{" "}
+            <input style={{flex: "0.5", border: "none", borderBottom: "1px solid grey", outline: "none", background: "aliceblue"}}
               type="text"
               value={userName}
               name="username"
               onChange={(e) => setUserName(e.target.value)}
             />
           </label>
-          <label htmlFor="email">
-            Email{" "}
-            <input
+          <label htmlFor="email" style={{width: "24vw", display: "flex", alignItems: "center", margin: "10px"}}>
+            <span style={{flex: "0.5"}}>Email</span>{" "}
+            <input style={{flex: "0.5", border: "none", borderBottom: "1px solid grey", outline: "none", background: "aliceblue"}}
               type="email"
               value={email}
               name="email"
               onChange={(e) => setEmail(e.target.value)}
             />
           </label>
-          <label htmlFor="password">
-            Password{" "}
-            <input
+          <label htmlFor="password" style={{width: "24vw", display: "flex", alignItems: "center", margin: "10px"}}>
+            <span style={{flex: "0.5"}}>Password</span>{" "}
+            <input style={{flex: "0.5", border: "none", borderBottom: "1px solid grey", outline: "none", background: "aliceblue"}}
               type="password"
               value={password}
               name="password"
@@ -69,8 +74,9 @@ const SignUpPage = () => {
             />
           </label>
         </form>
-        <div>
-          <button onClick={handleSavingData}>Sign Up</button>
+        <div style={{margin: "1rem", width: "21.5rem", display: "flex", justifyContent: "end"}}>
+          <button style={{padding: "10px", width: "10rem", border: "none", borderRadius: "7px", background: "#5656ff", cursor: "pointer", color: "white", fontSize: "15px"}} onClick={handleSavingData}>Sign Up</button>
+        </div>
         </div>
       </div>
     </>
