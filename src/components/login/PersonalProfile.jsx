@@ -15,13 +15,49 @@ const PersonalProfile = () => {
         tradeFees: 0,
     }]);
 
+
     const handleInputChange = (e, index) => { // Update stock data based on index
+       
         const { name, value } = e.target;
         const updatedStockDataList = [...stockDataList];
-        updatedStockDataList[index] = {
-            ...updatedStockDataList[index],
-            [name]: value
-        };
+        if(name==="stockName")
+        {
+            
+
+            
+
+            const selectedStock =JSON.parse(localStorage.getItem('allCompanyData')).find(company=>company.name===value);
+            const symbol = selectedStock ? selectedStock.symbol : '';
+            updatedStockDataList[index] = {
+                ...updatedStockDataList[index],
+                [name]: symbol,
+            };
+
+
+        }else if (name === "purchaseDate") {
+            const [year, month, day] = value.split('-');
+            const formattedDate = `${day}/${month}/${year.substring(2)}`;
+            updatedStockDataList[index] = {
+                ...updatedStockDataList[index],
+                [name]: formattedDate
+            };
+        }else if (name === "purchaseDate") {
+            
+            const [day, month, year] = value.split('/');
+            const formattedDate = `${year.padStart(2, '20')}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            updatedStockDataList[index] = {
+                ...updatedStockDataList[index],
+                [name]: formattedDate
+            };
+        }else{
+            updatedStockDataList[index] = {
+                ...updatedStockDataList[index],
+                [name]: value
+            };
+
+        }
+        
+       console.log("this is input changes",updatedStockDataList);
         setStockDataList(updatedStockDataList);
     };
     const handleAddMoreStock = () => {
@@ -200,6 +236,17 @@ const PersonalProfile = () => {
     useEffect(()=>{
         console.log(workBookData);
     }, [workBookData]);
+
+
+    stockDataList.forEach((stockData,index)=>{
+        console.log(stockData.purchaseDate);
+
+
+    });
+
+
+    
+
     
     return (
         <div>
@@ -264,7 +311,7 @@ const PersonalProfile = () => {
                                     id="stockName" 
                                     name="stockName" 
                                     style={{ padding: '8px', fontSize: '14px' }} 
-                                    value={stockData.stockName} 
+                                    value={stockData.name} 
                                     onChange={(e) => handleInputChange(e, index)} 
                                     required 
                                     list="stockNameOptions" 

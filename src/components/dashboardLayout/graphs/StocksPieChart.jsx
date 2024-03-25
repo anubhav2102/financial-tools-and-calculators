@@ -8,6 +8,38 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF6565'
 const StocksPieChart = () => {
     const [pieData, setPieData] = useState([]);
     const [currParam, setCurrParam] = useState('Purchase Price');
+    const [editClicked, setEditClicked] = useState(false);
+    const openEdit = () => {
+      setEditClicked(true);
+    }
+    const setEditParam = async (val) => {
+      console.log(val);
+      try {
+        let data = await axios.post('http://localhost:8000/api/v1/get-portfolio',{
+        email: localStorage.getItem('email_id')
+      });
+      console.log(data);
+      if(data.data.code===200){
+          let tempData = [];
+          for(let i=0;i<data.data.data.length;i++){
+            let obj = {};
+            obj['name'] = data.data.data[i]['Stock Name'];
+            if(val === 'Stocks Bought'){
+              obj[val] = Number(data.data.data[i][val]);
+            }else{
+              obj[val] = parseFloat(data.data.data[i][val].replace('$', '').replace(',', ''));
+            }
+            tempData.push(obj);
+          }
+          setPieData(tempData);
+          console.log(tempData)
+      }
+      } catch (error) {
+          console.error(error);
+      }
+      setCurrParam(val);
+      setEditClicked(false);
+    }
     useEffect(()=>{
         const getPortfolioData = async () => {
             try {
@@ -18,10 +50,10 @@ const StocksPieChart = () => {
             if(data.data.code===200){
                 let tempData = [];
                 for(let i=0;i<data.data.data.length;i++){
-                    tempData.push({name: data.data.data[i]['Stock Name'], price: parseFloat(data.data.data[i]['Purchase Price'].replace('$', '').replace(',', ''))});
+                    tempData.push({name: data.data.data[i]['Stock Name'], 'Purchase Price': parseFloat(data.data.data[i]['Purchase Price'].replace('$', '').replace(',', ''))});
                 }
                 setPieData(tempData);
-                setCurrParam('purchase Price');
+                setCurrParam('Purchase Price');
             }
             } catch (error) {
                 console.error(error);
@@ -31,7 +63,15 @@ const StocksPieChart = () => {
     },[])
   return (
     <div style={{margin: "4rem"}}>
-        <div style={{textAlign: "center", fontWeight: "500", fontSize: "20px"}}>Stock analysis with {currParam}</div>
+        <div style={{textAlign: "center", fontWeight: "500", fontSize: "20px", display: "flex", justifyContent: "center", alignItems: "center"}}><span>Stock analysis with &nbsp;</span> {
+          editClicked ? (<span style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", borderRadius: "10px"}} onClick={()=>setEditParam('Stocks Bought')}> Stocks Bought </span>
+            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", borderRadius: "10px"}} onClick={()=>setEditParam('Total Purchase Price')}> Total Purchase Price </span>
+            <span style={{cursor: "pointer", fontSize: "14px", fontWeight: "500", border:"1px solid grey", padding: "5px", margin:"5px", borderRadius: "10px"}} onClick={()=>setEditParam('Purchase Price')}> Purchase Price </span>
+          </span>) : (<span>
+            {currParam} <img onClick={openEdit} src="/assets/editPencil.png" style={{height: "15px", cursor: "pointer"}} alt="" />
+          </span>)
+        }</div>
         <div style={{display: "flex", justifyContent: "center"}}>
         <PieChart width={400} height={400}>
       <Pie
@@ -41,7 +81,7 @@ const StocksPieChart = () => {
         labelLine={false}
         outerRadius={80}
         fill="#8884d8"
-        dataKey="price"
+        dataKey={currParam}
       >
         {pieData.map((entry, index) => (
           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
