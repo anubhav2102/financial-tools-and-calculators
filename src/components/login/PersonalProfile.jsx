@@ -6,6 +6,7 @@ const XLSX = require('xlsx');
 const PersonalProfile = () => {
     const [loginStatus, setLoginStatus] = useState(false);
     let [workBookData, setWorkBookData] = useState([]);
+    let [showSaveStockButton, setShowSaveStockButton] = useState(true);
     let [columns, setColumns] = useState([]);
     const [stockDataList, setStockDataList] = useState([{ // Initialize with one stock form
         stockName: "",
@@ -15,6 +16,9 @@ const PersonalProfile = () => {
         tradeFees: 0,
     }]);
 
+    const reloadWindow = () => {
+        window.location.reload();
+    }
 
     const handleInputChange = (e, index) => { // Update stock data based on index
        
@@ -178,6 +182,7 @@ const PersonalProfile = () => {
                 }
             }
         }
+        setShowSaveStockButton(true);
     
         return jsonData;
     };
@@ -197,12 +202,14 @@ const PersonalProfile = () => {
             if(data.data && data.data.code===200){
                 if(data.data.data.length===0){
                     alert('No data to show');
+                    setShowSaveStockButton(false);
                     return;
                 }else{
                     let columns = [];
                     columns = Object.keys(data.data.data[0]);
                     setColumns(columns);
                     setWorkBookData(data.data.data);
+                    setShowSaveStockButton(false);
                 }
             }
         } catch (error) {
@@ -257,13 +264,17 @@ const PersonalProfile = () => {
                         <button onClick={handleLogout} style={{cursor: "pointer", width: "100px", padding: "7px", border: "none", borderRadius: "10px", background: "#6767ff", color: "white", fontSize: "16px"}}>Logout</button>
                     </div>
                     <div>
-                        <div style={{height: "50vh", display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        {
+                            (!workBookData || workBookData.length===0) && (
+                                <div style={{height: "50vh", display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                             <div onClick={() => document.getElementById("fileInput").click()} style={{display: "flex",flexDirection: "column",alignItems: "center",padding: "30px",border: "1px solid grey",borderRadius: "6px",cursor: "pointer"}}>
                                 <input type="file"id="fileInput"style={{ display: "none" }}accept=".xlsx, .xls" onChange={handleUploadXLFile}/>
                                 <img src="/assets/excel.png" alt="" />
                                 <span>Upload your stock portfolio here</span>
                             </div>
                         </div>
+                            )
+                        }
                     </div>
                     <div>
                                             {workBookData && workBookData.length > 0 ? (
@@ -288,22 +299,30 @@ const PersonalProfile = () => {
                                         </tbody>
                                     </table>
                                 </div>
-                                <div>
+                                {
+                                    showSaveStockButton ? (
+                                        <div style={{textAlign: "center"}}>
                                     <button className="buttons_personalProfile" onClick={() => savePortfolio('csv')}>Save as portfolio</button>
                                 </div>
+                                    ) : (
+                                        <div style={{textAlign: "center", margin: "2rem"}}>
+                                        <button className="buttons_personalProfile" onClick={() => reloadWindow()}>Update Portfolio</button>
+                                    </div>
+                                    )
+                                }
                             </div>
                         ) : (
-                            <div>
-                                <button className="buttons_personalProfile" onClick={getPortfolio}>Get your portfolio</button>
+                            <div style={{textAlign: "center"}}>
+                                <button className="buttons_personalProfile" onClick={getPortfolio}>Get your saved portfolio</button>
                             </div>
                         )}
 
                         
                     </div>
-                    {stockDataList.map((stockData, index) => (
+                    {showSaveStockButton && stockDataList.map((stockData, index) => (
                         <div key={index} className="stock-values" style={{ margin: '20px' }}>
                             <h2>Add Stock Information</h2>
-                            <form onSubmit={(e) => handleSubmit(e, index)} className="stock-form" style={{ display: 'flex', flexDirection: 'column' }}>
+                            <form onSubmit={(e) => handleSubmit(e, index)} className="stock-form" style={{ display: 'flex', margin: "20px", alignItems: "center" }}>
                             <div className="form-group" style={{ marginBottom: '15px' }}>
                                 <label htmlFor="stockName" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Stock Name:</label>
                                 <input 
@@ -343,7 +362,7 @@ const PersonalProfile = () => {
                                     <input type="number" id="tradeFees" name="tradeFees" style={{ padding: '8px', fontSize: '14px' }} value={stockData.tradeFees} onChange={(e) =>handleInputChange(e, index)} required />
                                 </div>
 
-                                {stockDataList.length > 1 && <button className="buttons_personalProfile" style={{width: "18%"}} onClick={() => handleDeleteStock(index)}>Delete</button>}
+                                {stockDataList.length > 1 && <button className="buttons_personalProfile" style={{width: "12%", height: "40px"}} onClick={() => handleDeleteStock(index)}>Delete</button>}
 
 
                                
@@ -353,14 +372,18 @@ const PersonalProfile = () => {
                     ))}
 
 
-           <div style={{display: 'flex', alignItems: 'center'}}>
+           <div style={{display: (!showSaveStockButton) ? 'none':'flex', alignItems: 'center'}}>
            <div>
                 <button className="buttons_personalProfile" onClick={handleAddMoreStock}>Add more stock</button>
             </div>
 
-            <div>
-                <button className="buttons_personalProfile" onClick={handleSubmit}>Save Stock</button>
-            </div>
+            {
+                stockDataList[0].stockName!=='' && (
+                    <div>
+                        <button className="buttons_personalProfile" onClick={handleSubmit}>Save Stock</button>
+                    </div>
+                )
+            }
            </div>
                     </>
                 )
