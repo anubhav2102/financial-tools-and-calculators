@@ -41,15 +41,33 @@ const LoginPage = () => {
     }
     return (
         <>
-        <div>
-            <form>
-                <label htmlFor="email">Email <input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)}  /></label>
-                <label htmlFor="password">Password <input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}  /></label>
-            </form>
-            <div>
-            <button onClick={handleLoginData}>Login</button>
-            </div>
+        <div style={{height: "90vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center"}}>
+        <div style={{background: "aliceblue", padding: "40px 30px 20px", borderRadius: "15px"}}>
+        <form style={{display: "flex", flexDirection: "column"}}>
+          <label htmlFor="email" style={{width: "24vw", display: "flex", alignItems: "center", margin: "10px"}}>
+            <span style={{flex: "0.5"}}>Email</span>{" "}
+            <input style={{flex: "0.5", border: "none", borderBottom: "1px solid grey", outline: "none", background: "aliceblue"}}
+              type="email"
+              value={email}
+              name="email"
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </label>
+          <label htmlFor="password" style={{width: "24vw", display: "flex", alignItems: "center", margin: "10px"}}>
+            <span style={{flex: "0.5"}}>Password</span>{" "}
+            <input style={{flex: "0.5", border: "none", borderBottom: "1px solid grey", outline: "none", background: "aliceblue"}}
+              type="password"
+              value={password}
+              name="password"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+        </form>
+        <div style={{margin: "1rem", width: "21.5rem", display: "flex", justifyContent: "end"}}>
+          <button style={{padding: "10px", width: "10rem", border: "none", borderRadius: "7px", background: "#5656ff", cursor: "pointer", color: "white", fontSize: "15px"}} onClick={handleLoginData}>Login</button>
         </div>
+        </div>
+      </div>
         </>
     )
 }
