@@ -7,9 +7,9 @@ const UserPortfolio = () => {
     const [columns, setColumns] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [showOpenAI, setShowOpenAI] = useState(false);
-    let[exceldata,setexceldata]=useState([]);
     let [aiData, setAiData] = useState({});
     let [loading, setLoading] = useState(false);
+    let [exceldata, setexceldata] = useState('');
 
     const openAI = async (data) => {
         setShowOpenAI(true);
@@ -24,13 +24,36 @@ const UserPortfolio = () => {
         setShowOpenAI(false);
     }
 
-    const handleReportCreate = () => {
-        console.log('')
+    const handleReportCreate = async () => {
+        try {
+            let prompt = `Please conduct a comprehensive financial analysis of the portfolio based on the given stock data. Include assessments of diversification, risk, return, and performance metrics for each stock. Additionally, calculate Compound Annual Growth Rate (CAGR), Sharpe Ratio, Treynor Ratio, and Information Ratio for the portfolio as a whole. Present the analysis in a structured format ensuring clarity and readability.`;
+            prompt += exceldata;
+            console.log(prompt);
+            let resp = await axios.post('http://localhost:8000/api/v1/generate-gpt-report',{
+                prompt: prompt
+            });
+            console.log(resp);
+            let content = JSON.stringify(resp.data.data);
+            console.log(content)
+            const blob = new Blob([content], { type: 'application/pdf' });
+
+            // Create a link element to download the PDF
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'report-portfolio.pdf';
+
+            // Add the link to the document body and trigger the download
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error(error);
+        }
     }
     const getCurrentPrice = async (stockName) => {
         try {
             console.log(stockName);
-        let resp = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stockName}&apikey=4OHOI8JFUFS52NXB`);
+        let resp = await axios.get(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stockName}&apikey=demo`);
         console.log(resp);
         let req = resp.data['Time Series (Daily)'];
         let allKeys = Object.keys(req);
@@ -61,16 +84,11 @@ const UserPortfolio = () => {
                         tempData.push(obj);
                     }
                     setTableData(tempData);
-                    console.log('this is excel data',tempData);
-                     exceldata = "Stock Name\tStocks Bought\tPurchase Price\tTotal Purchase Price\tDate\tTrade Fees\tCAGR\tGain/Loss\t% Gain/Loss\n";
-
+                    let excelData = "Stock Name\tStocks Bought\tPurchase Price\tTotal Purchase Price\tDate\tTrade Fees\tCAGR\tGain/Loss\t% Gain/Loss\n";
                         tempData.forEach(obj => {
-                            exceldata += `${obj['Stock Name']}\t${obj['Stocks Bought']}\t${obj['Purchase Price']}\t${obj['Total Purchase Price']}\t${obj['Date']}\t${obj['Trade Fees']}\t${obj['CAGR']}\t${obj['Gain/Loss']}\t${obj['% Gain/Loss']}\n`;
+                            excelData += `${obj['Stock Name']}\t${obj['Stocks Bought']}\t${obj['Purchase Price']}\t${obj['Total Purchase Price']}\t${obj['Date']}\t${obj['Trade Fees']}\t${obj['CAGR']}\t${obj['Gain/Loss']}\t${obj['% Gain/Loss']}\n`;
                         });
-
-                        console.log(exceldata,'this is format');
-                        setexceldata(exceldata);
-
+                    setexceldata(excelData);
                     let allKeys = Object.keys(tempData[0]);
                     console.log(allKeys);
                     allKeys.push('Ask AI?');
@@ -131,7 +149,7 @@ const UserPortfolio = () => {
             }
         </div>
         <div style={{display: "flex", justifyContent: "center", margin: "20px"}}>
-            <button onClick={handleReportCreate()} style={{cursor: "pointer", fontSize: "16px", padding: "13px", border: "none", borderRadius: "7px", background: "#7272ff", color: "white"}}>Generate AI based portfolio strategy report to invest better!</button>
+            <button onClick={()=>handleReportCreate()} style={{cursor: "pointer", fontSize: "16px", padding: "13px", border: "none", borderRadius: "7px", background: "#7272ff", color: "white"}}>Generate AI based portfolio strategy report to invest better!</button>
         </div>
         {
             showOpenAI && (
