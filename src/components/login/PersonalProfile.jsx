@@ -34,21 +34,6 @@ const PersonalProfile = () => {
             };
 
 
-        }else if (name === "purchaseDate") {
-            const [year, month, day] = value.split('-');
-            const formattedDate = `${day}/${month}/${year.substring(2)}`;
-            updatedStockDataList[index] = {
-                ...updatedStockDataList[index],
-                [name]: formattedDate
-            };
-        }else if (name === "purchaseDate") {
-            
-            const [day, month, year] = value.split('/');
-            const formattedDate = `${year.padStart(2, '20')}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            updatedStockDataList[index] = {
-                ...updatedStockDataList[index],
-                [name]: formattedDate
-            };
         }else{
             updatedStockDataList[index] = {
                 ...updatedStockDataList[index],
@@ -170,14 +155,16 @@ const PersonalProfile = () => {
         if (dateColumnIndex !== -1) { // If "Date" column is found
             for (let i = 1; i < jsonData.length; i++) {
                 const dateValue = jsonData[i][dateColumnIndex];
-                if (typeof dateValue === 'string') { 
-                    const [day, month, year] = dateValue.split('-').map(Number); 
-                    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) { 
-                        jsonData[i][dateColumnIndex] = `${day}-${month}-${year}`; 
+                if (typeof dateValue === 'string') {
+                    const [day, month, year] = dateValue.split('-').map(Number);
+                    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                        const formattedDate = `${day}-${month}-${year}`;
+                        jsonData[i][dateColumnIndex] = formattedDate.replace(/-/g, '/');
                     }
                 }
             }
         }
+        console.log("json",jsonData);
     
         return jsonData;
     };
@@ -329,6 +316,7 @@ const PersonalProfile = () => {
                                 </div>
 
                                 <div className="form-group" style={{ marginBottom: '15px' }}>
+                                    
                                     <label htmlFor="quantity" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Quantity:</label>
                                     <input type="number" id="quantity" name="quantity" style={{ padding: '8px', fontSize: '14px' }} value={stockData.quantity} onChange={(e) =>handleInputChange(e, index)} required />
                                 </div>

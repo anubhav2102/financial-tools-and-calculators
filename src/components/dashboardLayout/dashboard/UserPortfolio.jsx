@@ -7,6 +7,7 @@ const UserPortfolio = () => {
     const [columns, setColumns] = useState([]);
     const [tableData, setTableData] = useState([]);
     const [showOpenAI, setShowOpenAI] = useState(false);
+    let[exceldata,setexceldata]=useState([]);
     let [aiData, setAiData] = useState({});
     let [loading, setLoading] = useState(false);
 
@@ -60,6 +61,16 @@ const UserPortfolio = () => {
                         tempData.push(obj);
                     }
                     setTableData(tempData);
+                    console.log('this is excel data',tempData);
+                     exceldata = "Stock Name\tStocks Bought\tPurchase Price\tTotal Purchase Price\tDate\tTrade Fees\tCAGR\tGain/Loss\t% Gain/Loss\n";
+
+                        tempData.forEach(obj => {
+                            exceldata += `${obj['Stock Name']}\t${obj['Stocks Bought']}\t${obj['Purchase Price']}\t${obj['Total Purchase Price']}\t${obj['Date']}\t${obj['Trade Fees']}\t${obj['CAGR']}\t${obj['Gain/Loss']}\t${obj['% Gain/Loss']}\n`;
+                        });
+
+                        console.log(exceldata,'this is format');
+                        setexceldata(exceldata);
+
                     let allKeys = Object.keys(tempData[0]);
                     console.log(allKeys);
                     allKeys.push('Ask AI?');
