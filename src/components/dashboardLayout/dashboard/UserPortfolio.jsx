@@ -35,7 +35,7 @@ const UserPortfolio = () => {
     const handleReportCreate = async () => {
         try {
             setShowGeneratedReportModal(true);
-            let prompt = `Please conduct a comprehensive financial analysis of the portfolio based on the given stock data. Include assessments of diversification, risk, return, and performance metrics for each stock. Additionally, calculate Compound Annual Growth Rate (CAGR), Sharpe Ratio, Treynor Ratio, and Information Ratio for the portfolio as a whole. Present the analysis in a structured format ensuring clarity and readability.`;
+            let prompt = `Please conduct a comprehensive financial analysis of the portfolio based on the given stock data. Include assessments of diversification, risk, return, and performance metrics for each stock . Additionally, calculate Compound Annual Growth Rate (CAGR), Sharpe Ratio, Treynor Ratio, and Information Ratio for the portfolio as a whole. Present the analysis in a structured format ensuring clarity and readability.`;
             prompt += exceldata;
             console.log(prompt);
             let resp = await axios.post('http://localhost:8000/api/v1/generate-gpt-report',{
