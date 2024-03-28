@@ -7,6 +7,7 @@ const PersonalProfile = () => {
     const [loginStatus, setLoginStatus] = useState(false);
     let [workBookData, setWorkBookData] = useState([]);
     let [showSaveStockButton, setShowSaveStockButton] = useState(true);
+    let[showDeleteStockRowButton,setShowDeleteStockRowButton]=useState(false);
     let [columns, setColumns] = useState([]);
     const [stockDataList, setStockDataList] = useState([{ // Initialize with one stock form
         stockName: "",
@@ -23,7 +24,11 @@ const PersonalProfile = () => {
     const handleInputChange = (e, index) => { // Update stock data based on index
        
         const { name, value } = e.target;
+
         const updatedStockDataList = [...stockDataList];
+
+
+        
         if(name==="stockName")
         {
             
@@ -38,21 +43,6 @@ const PersonalProfile = () => {
             };
 
 
-        }else if (name === "purchaseDate") {
-            const [year, month, day] = value.split('-');
-            const formattedDate = `${day}/${month}/${year.substring(2)}`;
-            updatedStockDataList[index] = {
-                ...updatedStockDataList[index],
-                [name]: formattedDate
-            };
-        }else if (name === "purchaseDate") {
-            
-            const [day, month, year] = value.split('/');
-            const formattedDate = `${year.padStart(2, '20')}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            updatedStockDataList[index] = {
-                ...updatedStockDataList[index],
-                [name]: formattedDate
-            };
         }else{
             updatedStockDataList[index] = {
                 ...updatedStockDataList[index],
@@ -86,7 +76,14 @@ const PersonalProfile = () => {
         e.preventDefault();
         let tempData = [];
         for(let i=0;i<stockDataList.length;i++){
-            let obj = {'Stock Name': stockDataList[i]['stockName'],'Trade Fees': stockDataList[i]['tradeFees'], 'Stocks Bought' : stockDataList[i]['quantity'],'Date': stockDataList[i]['purchaseDate'], 'Purchase Price': stockDataList[i]['pricePerStock']};
+
+            let dateParts = stockDataList[i]['purchaseDate'].split('-'); // Split the date string by hyphens
+            let formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0].substring(2)}`; // Format the date as DD/MM/YYYY
+            let obj = {'Stock Name': stockDataList[i]['stockName'],
+                       'Trade Fees': stockDataList[i]['tradeFees'], 
+                       'Stocks Bought' : stockDataList[i]['quantity'],
+                       'Date': formattedDate, 
+                       'Purchase Price': stockDataList[i]['pricePerStock']};
             tempData.push(obj);
         }
 
@@ -159,6 +156,8 @@ const PersonalProfile = () => {
     
         reader.readAsArrayBuffer(file);
 
+        setShowDeleteStockRowButton(true);
+
         // here this is redering localstorage
 
     };
@@ -174,10 +173,11 @@ const PersonalProfile = () => {
         if (dateColumnIndex !== -1) { // If "Date" column is found
             for (let i = 1; i < jsonData.length; i++) {
                 const dateValue = jsonData[i][dateColumnIndex];
-                if (typeof dateValue === 'string') { 
-                    const [day, month, year] = dateValue.split('-').map(Number); 
-                    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) { 
-                        jsonData[i][dateColumnIndex] = `${day}-${month}-${year}`; 
+                if (typeof dateValue === 'string') {
+                    const [month, day, year] = dateValue.split('/').map(Number);
+                    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                        const formattedDate = `${day}/${month}/${String(year).slice(-2)}`; // Format the date as DD/MM/YY
+                        jsonData[i][dateColumnIndex] = formattedDate;
                     }
                 }
             }
@@ -186,6 +186,7 @@ const PersonalProfile = () => {
     
         return jsonData;
     };
+    
     
 
        
@@ -238,8 +239,39 @@ const PersonalProfile = () => {
         } catch (error) {
             alert(error);
         }
+        setShowDeleteStockRowButton(false);
     }
 
+    const handleDeleteRow = (rowIndex) => {
+        const updatedData = [...workBookData];
+        updatedData.splice(rowIndex, 1);
+        setWorkBookData(updatedData);
+    };
+    
+   
+    
+    const deleteStock = async (email, rowIndex, workBookData) => {
+        try {
+            const res = await axios.post("http://localhost:8000/api/v1/delete-stock", {
+                email, rowIndex, workBookData
+            });
+    
+            if (res.status === 200) {
+                const updatedData = [...workBookData];
+                updatedData.splice(rowIndex, 1);
+                setWorkBookData(updatedData);
+            }
+    
+            return res.data;
+        } catch (error) {
+            console.error("Error deleting stock:", error);
+            throw error;
+        }
+    };
+ 
+
+   
+   
     useEffect(()=>{
         console.log(workBookData);
     }, [workBookData]);
@@ -294,7 +326,14 @@ const PersonalProfile = () => {
                                                     {columns.map((column, colIndex) => (
                                                         <td key={colIndex}>{rowData[column]}</td>
                                                     ))}
-                                                </tr>
+                                                    {!showDeleteStockRowButton && (
+                                                            <td>
+                                                                <button onClick={() => deleteStock(localStorage.getItem('email_id'), rowIndex, workBookData)}>Delete</button>
+
+                                                            </td>
+                                                            
+                                                        )} 
+                                            </tr>
                                             ))}
                                         </tbody>
                                     </table>
@@ -348,6 +387,7 @@ const PersonalProfile = () => {
                                 </div>
 
                                 <div className="form-group" style={{ marginBottom: '15px' }}>
+                                    
                                     <label htmlFor="quantity" style={{ fontWeight: 'bold', marginBottom: '5px', marginRight: "10px" }}>Quantity:</label>
                                     <input type="number" id="quantity" name="quantity" style={{ padding: '8px', fontSize: '14px' }} value={stockData.quantity} onChange={(e) =>handleInputChange(e, index)} required />
                                 </div>

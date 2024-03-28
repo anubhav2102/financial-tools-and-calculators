@@ -32,7 +32,13 @@ const SignUpPage = () => {
         }
       );
       console.log(resp);
+
+
       if(resp.status===200){
+        localStorage.setItem("user_name",userName);
+
+
+
         alert("Registration completed!")
         navigate("/login")
       }

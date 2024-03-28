@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./UserPortfolio.css";
 import DetailedAIModal from "../AI/DetailedAIModal";
+import GeneratedReportModal from "../AI/GeneratedReportModal";
 
 const UserPortfolio = () => {
     const [columns, setColumns] = useState([]);
@@ -10,6 +11,8 @@ const UserPortfolio = () => {
     let [aiData, setAiData] = useState({});
     let [loading, setLoading] = useState(false);
     let [exceldata, setexceldata] = useState('');
+    let [generatedReportData, setGeneratedReportData] = useState('');
+    let [showGeneratedReportModal ,setShowGeneratedReportModal] = useState(false);
 
     const openAI = async (data) => {
         setShowOpenAI(true);
@@ -24,28 +27,23 @@ const UserPortfolio = () => {
         setShowOpenAI(false);
     }
 
+    const closeGeneratedeReportModal = () => {
+        setGeneratedReportData('');
+        setShowGeneratedReportModal(false);
+    }
+
     const handleReportCreate = async () => {
         try {
-            let prompt = `Please conduct a comprehensive financial analysis of the portfolio based on the given stock data. Include assessments of diversification, risk, return, and performance metrics for each stock. Additionally, calculate Compound Annual Growth Rate (CAGR), Sharpe Ratio, Treynor Ratio, and Information Ratio for the portfolio as a whole. Present the analysis in a structured format ensuring clarity and readability.`;
+            setShowGeneratedReportModal(true);
+            let prompt = `Please conduct a comprehensive financial analysis of the portfolio based on the given stock data. Include assessments of diversification, risk, return, and performance metrics for each stock . Additionally, calculate Compound Annual Growth Rate (CAGR), Sharpe Ratio, Treynor Ratio, and Information Ratio for the portfolio as a whole. Present the analysis in a structured format ensuring clarity and readability.`;
             prompt += exceldata;
             console.log(prompt);
             let resp = await axios.post('http://localhost:8000/api/v1/generate-gpt-report',{
                 prompt: prompt
             });
             console.log(resp);
-            let content = JSON.stringify(resp.data.data);
-            console.log(content)
-            const blob = new Blob([content], { type: 'application/pdf' });
-
-            // Create a link element to download the PDF
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'report-portfolio.pdf';
-
-            // Add the link to the document body and trigger the download
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            let content = resp.data.data;
+            setGeneratedReportData(content);
         } catch (error) {
             console.error(error);
         }
@@ -163,6 +161,26 @@ const UserPortfolio = () => {
                             {
                                 <>
                                 <DetailedAIModal stockData={aiData} duration={'5 min'} />
+                                </>
+                            }
+                        </div>
+                    </div>
+                </div>
+                </>
+            )
+        }
+        {
+            showGeneratedReportModal && (
+                <>
+                <div style={{position: "fixed", height: "100%", width: "100%", left: "0%", top: "0%", backgroundColor: "rgba(0, 0, 0, .7333333333333333)", zIndex: "9"}}>
+                    <div style={{position: "fixed", height: "85vh", width: "90vw", left: "4rem", top: "3rem", background: "white", borderRadius: "10px"}}>
+                        <div style={{textAlign: "end", margin: "10px 10px 0px 0px"}}>
+                            <img onClick={closeGeneratedeReportModal} src="/assets/Close.svg" style={{height: "20px", cursor: "pointer"}} alt="" />
+                        </div>
+                        <div>
+                            {
+                                <>
+                                <GeneratedReportModal reportData={generatedReportData} />
                                 </>
                             }
                         </div>
